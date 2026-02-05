@@ -3,38 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Basic SEO -->
   <title>Endroid OS - Windows 7 Style Browser Desktop</title>
-  <meta name="description" content="Endroid OS - a nostalgic Windows 7 inspired desktop environment that runs entirely in your browser. Includes classic apps, mod support and retro UI." />
-  <meta name="keywords" content="endroid os, windows 7 simulator, browser desktop, retro os, windows 7 online, vintage desktop" />
-  <meta name="author" content="Mudasir" />
+  <meta name="description" content="Endroid OS - nostalgic Windows 7 desktop environment running in browser with classic apps and mod support." />
+  <meta name="keywords" content="endroid os, windows 7 simulator, browser desktop, retro os, windows 7 online" />
   <meta name="robots" content="index, follow" />
 
-  <!-- Open Graph / Facebook -->
+  <!-- Open Graph -->
   <meta property="og:title" content="Endroid OS - Retro Windows 7 Experience" />
-  <meta property="og:description" content="Experience a classic Windows 7-style desktop directly in your browser with apps, taskbar, start menu and more." />
+  <meta property="og:description" content="Classic Windows 7-style desktop in your browser – taskbar, start menu, apps." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://yourdomain.com/" />
   <meta property="og:image" content="https://yourdomain.com/preview.jpg" />
-  <meta property="og:site_name" content="Endroid OS" />
 
-  <!-- Twitter / X Cards -->
+  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Endroid OS - Windows 7 in Browser" />
-  <meta name="twitter:description" content="Nostalgic Windows 7 desktop simulator with classic apps and mod support." />
+  <meta name="twitter:description" content="Nostalgic Windows 7 simulator with apps and retro UI." />
   <meta name="twitter:image" content="https://yourdomain.com/preview.jpg" />
 
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="https://codehs.com/uploads/874a3f0402f63c983bcbf5a43a182493" />
-
-  <!-- Fonts -->
   <link rel="stylesheet" media="screen" href="https://fontlibrary.org/en/face/pixel-operator" type="text/css"/>
-
-  <!-- 7.css (Windows 7 theme) -->
   <link id="theme-css" rel="stylesheet" href="https://unpkg.com/7.css/dist/7.css" />
 
-  <!-- Inline critical CSS -->
   <style>
     :root{--taskbar-height:36px;--aero-blue:#0078d7;--text-shadow:1px 1px 2px rgba(0,0,0,0.6)}
     @font-face{font-family:'Pixel Operator';src:url("https://fontlibrary.org/en/face/pixel-operator") format("woff2");font-display:swap}
@@ -49,10 +39,14 @@
     .window.opening{animation:win7-flap 280ms ease-out}
     @keyframes fadeOut{from{opacity:1}to{opacity:0}}
     .window.closing{animation:fadeOut 180ms ease-out forwards}
-    #taskbar{position:fixed;left:0;right:0;bottom:0;height:var(--taskbar-height);display:flex;align-items:center;gap:8px;padding:4px 8px;background:linear-gradient(to bottom,rgba(220,236,250,0.25),rgba(160,190,230,0.45),rgba(120,160,210,0.4));border-top:1px solid rgba(0,0,0,0.4);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:9999;box-shadow:0 -3px 12px rgba(0,0,0,0.6)}
-    #task-buttons{flex:1;display:flex;gap:6px;overflow-x:auto}
+    #taskbar{position:fixed;left:0;right:0;bottom:0;height:var(--taskbar-height);display:flex;align-items:center;gap:8px;padding:4px 8px;background:linear-gradient(to bottom,rgba(220,236,250,0.25),rgba(160,190,230,0.45),rgba(120,160,210,0.4));border-top:1px solid rgba(0,0,0,0.4);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:9999;box-shadow:0 -3px 12px rgba(0,0,0,0.6);overflow-x:auto;white-space:nowrap}
+    #task-buttons{flex:1;display:flex;gap:6px;overflow-x:auto;flex-shrink:1}
     #clock{margin-left:auto;padding:0 10px;color:white;text-align:right;min-width:70px;transition:filter .15s}
     #clock:hover{filter:brightness(85%)}
+    #start-btn{display:flex;align-items:center;gap:6px;padding:4px 12px;height:32px;min-width:80px;background:transparent;border:none;cursor:pointer;transition:filter .2s}
+    #start-btn:hover{filter:brightness(115%)}
+    #start-btn-img{width:28px;height:28px;object-fit:contain}
+    #start-btn-text{color:white;font-size:13px;opacity:1;visibility:visible}
     #start-menu{position:absolute;bottom:var(--taskbar-height);left:8px;width:320px;height:420px;display:none;flex-direction:row;border:2px solid #333;border-radius:6px;background:rgba(245,245,245,0.3);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:3px 4px 14px rgba(0,0,0,0.5);overflow:hidden;z-index:9998}
     #start-menu.opening{display:flex;animation:start-slide-up 260ms ease-out}
     #start-menu.closing{animation:start-slide-down 240ms ease-in forwards}
@@ -81,19 +75,23 @@
     body.classic-theme #taskbar{background:#c0c0c0;border-top:2px solid white;border-left:2px solid white;border-right:2px solid #808080;border-bottom:2px solid #808080;backdrop-filter:none}
     body.classic-theme .task-button,body.classic-theme #start-btn{border:2px outset #dfdfdf;background:#c0c0c0;font-family:"MS Sans Serif",Tahoma,sans-serif}
     body.classic-theme .task-button:active,body.classic-theme #start-btn:active{border-style:inset}
-    #start-btn:hover{filter:brightness(115%)}
     #battery-icon,#browser-shortcut-icon,#start-btn-img{transition:filter .18s}
     #battery-icon:hover,#browser-shortcut-icon:hover,#start-btn-img:hover{filter:brightness(120%)}
     .shrinking{animation:shrinkOut 220ms forwards}
     @keyframes shrinkOut{to{transform:scale(0.4);opacity:0}}
     .no-scrollbars{overflow:hidden !important}
+    @media (max-width:600px){
+      #start-btn{padding:4px 8px;min-width:60px}
+      #start-btn-img{width:24px;height:24px}
+      #start-btn-text{font-size:11px}
+    }
   </style>
 </head>
 <body>
 
 <div id="desktop" tabindex="0" aria-label="Desktop">
   <div class="shortcut" id="browser-shortcut" data-launch="chrome" style="display:inline-block;text-align:center;width:70px;margin:5px;cursor:default;">
-    <img id="browser-shortcut-icon" src="https://codehs.com/uploads/bf7b7130c279ce42df3a72328f5bca3d" alt="Browser Icon" title="Browse the modern web!" style="width:50px;height:50px;cursor:url('https://archive.org/download/windows7_cursors/aero-cursors/aero_arrow.cur'),default;">
+    <img id="browser-shortcut-icon" src="https://codehs.com/uploads/bf7b7130c279ce42df3a72328f5bca3d" alt="Browser" title="Browse the modern web!" style="width:50px;height:50px;cursor:url('https://archive.org/download/windows7_cursors/aero-cursors/aero_arrow.cur'),default;">
     <div class="shortcut-label" style="margin-top:4px;font-size:12px;color:white;">Browser</div>
   </div>
 
