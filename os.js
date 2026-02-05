@@ -43,12 +43,12 @@ const Apps = {
     title: 'About BNAOS',
     content: () => `
       <div class="field-row-stacked" style="text-align:center;">
-        <h3>What <i>is</i> BNAOS?</h3>
-        <p>BNAOS is a desktop environment developed to emulate Windows binaries in the browser.</p>
+        <h3>What <i>is</i> Endroid OS</h3>
+        <p>Endroid OS is a desktop environment developed to emulate Windows binaries in the browser.</p>
         <p>It supports up to 10-core usage for emulation and fully simulates the Windows UI.</p>
         <h3>Version</h3>
         <p>(emulated) Microsoft Windows 7 SP2</p>
-        <p>(simulated) BNAOS Version Release 5.2.72 Iteration 1 (Aero Glass)</p>
+        <p>(simulated) Endroid OS Version Release 5.2.72 Iteration 1</p>
       </div>
     `,
     width: 300,
@@ -250,7 +250,7 @@ welcome: {
   title: 'Welcome!',
   content: () => `
     <div class="window-body" style="text-align:center; padding:1em;">
-      <h2>Welcome to BNAOS!</h2>
+      <h2>Welcome to Endroid OS</h2>
       <p>In this operating system, you can multitask like the top banana!</p>
       <p>To continue with the tutorial, click "Continue". To exit, click the red "X" in the title bar.</p>
       <button class="button primary" onclick="
@@ -388,7 +388,7 @@ tutorial: {
       
       
 
-       Last Updated: February 7, 2022 
+       Last Updated: February 5, 2026 
       
     
 
@@ -607,11 +607,6 @@ tutorial: {
 </div>
 
     
-</div>
-      </ol>
-      <p>Enjoy your retro desktop experience!</p>
-      <footer>Follow <a href="https://www.youtube.com/@TheBananamanJCGaming">@TheBananamanJCGaming</a> on YouTube for more projects like this!</footer>
-    </div>
   `,
   width: 400,
   height: 300,
@@ -690,7 +685,7 @@ saveas: {
         <label>Save in:</label>
         <div class="save-location">
           <ul class="folder-list">
-            <li><strong>Downloads</strong> (C:\\Users\\BNAOS\\Downloads)</li>
+            <li><strong>Downloads</strong> (C:\\Users\\Endroid OS\\Downloads)</li>
             <li>Documents</li>
             <li>Pictures</li>
             <li>Music</li>
