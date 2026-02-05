@@ -8,109 +8,169 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
     :root {
-      --bg: #0f0f1a;
-      --surface: rgba(30,30,50,0.92);
-      --text: #e0e0ff;
-      --accent: #8ab4f8;
+      --primary: #4285f4;
+      --surface: #f1f3f4;
+      --on-surface: #202124;
+      --elevation-2: 0 3px 6px rgba(0,0,0,0.1);
     }
+    * { margin:0; padding:0; box-sizing:border-box; }
     body {
-      margin:0; height:100vh; font-family:Roboto,sans-serif; color:var(--text);
-      background: var(--bg) url('https://images.alphacoders.com/135/1356698.png') center/cover fixed;
-      overflow:hidden; display:flex; flex-direction:column;
+      font-family: 'Roboto', sans-serif;
+      background: #fff url('https://wallpapercave.com/wp/wp7871523.jpg') center/cover fixed;
+      color: var(--on-surface);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
     #desktop {
-      flex:1; padding:16px; overflow-y:auto;
+      flex:1; padding:24px; overflow-y:auto;
       display:grid; grid-template-columns:repeat(auto-fill,96px);
-      justify-content:center; gap:16px;
+      justify-content:start; gap:24px;
     }
     .app {
       width:96px; text-align:center; cursor:pointer; transition:0.2s;
     }
-    .app:hover { transform:scale(1.12); }
+    .app:hover { transform:scale(1.1); }
     .app img {
-      width:64px; height:64px; border-radius:16px; background:rgba(255,255,255,0.1);
-      padding:8px; box-shadow:0 4px 12px rgba(0,0,0,0.6);
+      width:64px; height:64px; border-radius:50%; background:white;
+      padding:8px; box-shadow:var(--elevation-2);
     }
-    .app span { font-size:13px; display:block; margin-top:6px; color:#c0c8ff; }
-    #launcher {
-      position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(20px);
+    .app span { font-size:13px; display:block; margin-top:8px; }
+    #shelf {
+      height:64px; background:rgba(255,255,255,0.95); backdrop-filter:blur(20px);
+      border-top:1px solid #e0e0e0; display:flex; align-items:center; padding:0 24px;
+      gap:16px; box-shadow:0 -4px 12px rgba(0,0,0,0.05); z-index:999;
+    }
+    #search-bar {
+      flex:1; max-width:600px; height:48px; border-radius:24px;
+      background:white; display:flex; align-items:center; padding:0 16px;
+      box-shadow:var(--elevation-2); gap:12px;
+    }
+    #search-bar .material-icons { color:#5f6368; font-size:24px; }
+    #search-input {
+      flex:1; border:none; outline:none; font-size:16px; background:none;
+    }
+    .pinned { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+    .pinned img { width:40px; height:40px; border-radius:50%; }
+    #clock { color:#5f6368; font-size:14px; }
+    #app-launcher {
+      position:fixed; inset:0; background:rgba(255,255,255,0.8); backdrop-filter:blur(32px);
       display:none; flex-direction:column; align-items:center; justify-content:center;
       z-index:9999; padding:40px; overflow-y:auto;
     }
     #launcher-grid {
       display:grid; grid-template-columns:repeat(auto-fill,120px);
-      gap:24px; max-width:1200px;
+      gap:24px; max-width:1000px;
     }
-    #launcher .app img { width:80px; height:80px; }
-    #launcher .app span { font-size:15px; font-weight:500; }
-    #taskbar {
-      height:64px; background:var(--surface); backdrop-filter:blur(24px);
-      border-top:1px solid #333; display:flex; align-items:center; padding:0 16px;
-      gap:12px; box-shadow:0 -4px 16px rgba(0,0,0,0.5); z-index:999;
+    #launcher-grid .app img { border-radius:24px; }
+    .window {
+      position:absolute; background:white; border-radius:16px; overflow:hidden;
+      box-shadow:0 8px 24px rgba(0,0,0,0.2); min-width:600px; min-height:400px;
+      resize:both; max-width:90vw; max-height:90vh;
     }
-    #start { width:48px; height:48px; border-radius:50%; background:var(--accent);
-      color:#000; font-size:28px; display:flex; align-items:center; justify-content:center;
-      cursor:pointer; box-shadow:0 3px 10px rgba(138,180,248,0.4);
-    }
-    .task { width:48px; height:48px; border-radius:12px; background:rgba(255,255,255,0.08);
-      display:flex; align-items:center; justify-content:center; color:#fff; font-size:24px;
-      cursor:pointer;
-    }
-    #clock { margin-left:auto; color:#b0c0ff; font-size:14px; }
+    .title-bar { height:48px; background:var(--primary); color:white; display:flex; align-items:center; padding:0 16px; cursor:move; }
+    .title-text { flex:1; font-size:18px; }
+    .win-btn { background:none; border:none; color:white; font-size:24px; cursor:pointer; margin-left:12px; }
   </style>
 </head>
 <body>
-
-<div id="desktop">
-  <div class="app" data-url="https://www.google.com"><img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt=""><span>Google</span></div>
-  <div class="app" data-url="https://youtube.com"><img src="https://www.youtube.com/s/desktop/14e7d2c5/img/favicon_144x144.png" alt=""><span>YouTube</span></div>
-  <div class="app" data-url="https://drive.google.com"><img src="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png" alt=""><span>Drive</span></div>
-  <div class="app" data-url="https://docs.google.com"><img src="https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico" alt=""><span>Docs</span></div>
-  <div class="app" data-url="https://photos.google.com"><img src="https://ssl.gstatic.com/photos/images/favicon2.png" alt=""><span>Photos</span></div>
-</div>
-
-<div id="taskbar">
-  <div id="start" class="material-icons">apps</div>
-  <div id="task-buttons"></div>
-  <div id="clock"></div>
-</div>
-
-<div id="launcher">
-  <div id="launcher-grid">
-    <div class="app" data-url="https://www.google.com"><img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt=""><span>Google</span></div>
+  <div id="desktop">
+    <!-- Desktop icons -->
+    <div class="app" data-url="https://www.google.com"><img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt=""><span>Chrome</span></div>
     <div class="app" data-url="https://youtube.com"><img src="https://www.youtube.com/s/desktop/14e7d2c5/img/favicon_144x144.png" alt=""><span>YouTube</span></div>
     <div class="app" data-url="https://drive.google.com"><img src="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png" alt=""><span>Drive</span></div>
-    <div class="app" data-url="https://docs.google.com"><img src="https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico" alt=""><span>Docs</span></div>
-    <div class="app" data-url="https://photos.google.com"><img src="https://ssl.gstatic.com/photos/images/favicon2.png" alt=""><span>Photos</span></div>
-    <div class="app" data-url="https://mail.google.com"><img src="https://ssl.gstatic.com/ui/v1/icons/mail/images/favicon2.ico" alt=""><span>Gmail</span></div>
-    <div class="app" data-url="https://meet.google.com"><img src="https://www.gstatic.com/meet/user_branding_change.jpg" alt=""><span>Meet</span></div>
-    <div class="app" data-url="https://play.google.com/store"><img src="https://play-lh.googleusercontent.com/38AGKCqmbjZ9OuWx4YjssAz3Y0DTWbiM5HB0ove1pNBq_o9mtWfGszjZNxZdwt_vgHo" alt=""><span>Play Store</span></div>
   </div>
-</div>
 
-<script>
-  const start = document.getElementById('start');
-  const launcher = document.getElementById('launcher');
-  const desktop = document.getElementById('desktop');
-  const taskbar = document.getElementById('taskbar');
-  const clock = document.getElementById('clock');
+  <div id="shelf">
+    <div id="search-bar">
+      <span class="material-icons">search</span>
+      <input id="search-input" type="text" placeholder="Type to search">
+    </div>
+    <div id="pinned-apps">
+      <!-- Pinned -->
+      <div class="pinned"><img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Chrome"></div>
+      <div class="pinned"><img src="https://www.youtube.com/s/desktop/14e7d2c5/img/favicon_144x144.png" alt="YouTube"></div>
+    </div>
+    <div id="clock"></div>
+  </div>
 
-  start.onclick = () => launcher.style.display = launcher.style.display === 'flex' ? 'none' : 'flex';
-  launcher.onclick = e => { if (e.target === launcher) launcher.style.display = 'none'; };
+  <div id="app-launcher">
+    <div id="launcher-grid">
+      <div class="app" data-url="https://www.google.com"><img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt=""><span>Chrome</span></div>
+      <div class="app" data-url="https://youtube.com"><img src="https://www.youtube.com/s/desktop/14e7d2c5/img/favicon_144x144.png" alt=""><span>YouTube</span></div>
+      <div class="app" data-url="https://drive.google.com"><img src="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_48dp.png" alt=""><span>Drive</span></div>
+      <div class="app" data-url="https://docs.google.com"><img src="https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico" alt=""><span>Docs</span></div>
+      <div class="app" data-url="https://photos.google.com"><img src="https://ssl.gstatic.com/photos/images/favicon2.png" alt=""><span>Photos</span></div>
+      <div class="app" data-url="https://mail.google.com"><img src="https://ssl.gstatic.com/ui/v1/icons/mail/images/favicon2.ico" alt=""><span>Gmail</span></div>
+      <div class="app" data-url="https://play.google.com/store"><img src="https://play-lh.googleusercontent.com/38AGKCqmbjZ9OuWx4YjssAz3Y0DTWbiM5HB0ove1pNBq_o9mtWfGszjZNxZdwt_vgHo" alt=""><span>Play Store</span></div>
+      <div class="app" data-url="https://calendar.google.com"><img src="https://calendar.google.com/googlecalendar/images/favicons_2020q4/calendar_1.ico" alt=""><span>Calendar</span></div>
+      <div class="app" data-url="https://maps.google.com"><img src="https://www.google.com/images/branding/product/ico/maps_2021.ico" alt=""><span>Maps</span></div>
+    </div>
+  </div>
 
-  // open web apps
-  document.querySelectorAll('.app').forEach(el => {
-    el.onclick = () => {
-      const url = el.dataset.url;
-      if (url) window.open(url, '_blank', 'width=1200,height=800');
-      launcher.style.display = 'none';
-    };
-  });
+  <script>
+    const desktop = document.getElementById('desktop');
+    const launcher = document.getElementById('app-launcher');
+    const searchInput = document.getElementById('search-input');
+    const clock = document.getElementById('clock');
+    const taskButtons = document.getElementById('task-buttons');
+    let windows = new Map();
 
-  // clock
-  setInterval(() => {
-    clock.textContent = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-  }, 1000);
-</script>
+    searchInput.addEventListener('focus', () => launcher.style.display = 'flex');
+    launcher.addEventListener('click', e => { if (e.target === launcher) launcher.style.display = 'none'; });
+
+    document.querySelectorAll('.app').forEach(el => {
+      el.addEventListener('click', () => {
+        const url = el.dataset.url;
+        if (url) openApp(url, el.querySelector('span').textContent);
+      });
+    });
+
+    function openApp(url, title) {
+      const id = Date.now();
+      const win = document.createElement('div');
+      win.className = 'window';
+      win.style.left = '50px';
+      win.style.top = '50px';
+      win.innerHTML = `
+        <div class="title-bar">
+          <span class="title-text">${title}</span>
+          <button class="win-btn material-icons">minimize</button>
+          <button class="win-btn material-icons">close</button>
+        </div>
+        <iframe src="${url}" style="width:100%;height:calc(100% - 48px);border:none;"></iframe>
+      `;
+      desktop.appendChild(win);
+      const bar = win.querySelector('.title-bar');
+      makeDraggable(win, bar);
+      const btn = document.createElement('div');
+      btn.className = 'task';
+      btn.innerHTML = `<img src="${el.querySelector('img').src}" style="width:32px;height:32px;border-radius:50%;">`;
+      taskButtons.appendChild(btn);
+      btn.onclick = () => win.style.display = win.style.display === 'none' ? 'block' : 'none';
+      win.querySelector('.win-btn:last-child').onclick = () => {
+        win.remove();
+        btn.remove();
+      };
+      windows.set(id, win);
+    }
+
+    function makeDraggable(win, bar) {
+      let offsetX, offsetY;
+      bar.addEventListener('mousedown', e => {
+        offsetX = e.clientX - win.getBoundingClientRect().left;
+        offsetY = e.clientY - win.getBoundingClientRect().top;
+        const move = e => {
+          win.style.left = `${e.clientX - offsetX}px`;
+          win.style.top = `${e.clientY - offsetY}px`;
+        };
+        document.addEventListener('mousemove', move);
+        document.addEventListener('mouseup', () => document.removeEventListener('mousemove', move), {once: true});
+      });
+    }
+
+    setInterval(() => clock.textContent = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), 1000);
+  </script>
 </body>
 </html>
