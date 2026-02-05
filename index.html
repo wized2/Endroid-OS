@@ -13,12 +13,6 @@
             --on-surface: #202124;
             --elevation-2: 0 3px 6px rgba(0,0,0,0.1);
             --elevation-3: 0 8px 24px rgba(0,0,0,0.2);
-            --background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
-            --icon-size: 80px;
-            --icon-gap: 20px;
-            --desktop-padding: 20px;
-            --icons-per-row: 8;
-            --row-gap: 30px;
         }
 
         .dark-mode {
@@ -49,11 +43,11 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: var(--background);
+            background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            z-index: -1;
+            z-index: 1;
             transition: background-image 0.5s ease;
         }
         
@@ -64,38 +58,40 @@
             left: 0;
             right: 0;
             bottom: 56px;
-            overflow: hidden;
-            padding: var(--desktop-padding);
+            overflow: auto;
+            padding: 20px;
+            z-index: 2;
         }
         
         /* Desktop Icons Grid */
         .desktop-icons-grid {
             display: grid;
-            grid-template-columns: repeat(var(--icons-per-row), var(--icon-size));
-            grid-auto-rows: var(--icon-size);
-            gap: var(--row-gap) var(--icon-gap);
-            padding: 20px;
-            position: relative;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            grid-auto-rows: 90px;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
         .desktop-icon {
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: var(--icon-size);
+            justify-content: center;
             padding: 10px;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
             color: white;
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
             background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(5px);
             user-select: none;
+            text-decoration: none;
         }
         
         .desktop-icon:hover {
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.3);
             transform: translateY(-2px);
         }
         
@@ -103,14 +99,9 @@
             transform: translateY(0);
         }
         
-        .desktop-icon.selected {
-            background: rgba(255,255,255,0.3);
-            outline: 2px solid rgba(255,255,255,0.8);
-        }
-        
         .desktop-icon .material-icons {
             font-size: 36px;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             background: rgba(255,255,255,0.9);
             padding: 10px;
             border-radius: 8px;
@@ -148,6 +139,7 @@
             max-width: calc(100vw - 40px);
             max-height: calc(100vh - 96px);
             color: var(--on-surface);
+            z-index: 100;
         }
         
         .dark-mode .window {
@@ -176,6 +168,8 @@
             padding: 0 12px;
             cursor: move;
             user-select: none;
+            position: relative;
+            z-index: 101;
         }
         
         .dark-mode .title-bar {
@@ -222,6 +216,8 @@
             justify-content: center;
             transition: background 0.2s;
             color: #5f6368;
+            position: relative;
+            z-index: 102;
         }
         
         .dark-mode .win-btn {
@@ -245,6 +241,8 @@
             flex: 1;
             overflow: hidden;
             background: white;
+            position: relative;
+            z-index: 100;
         }
         
         .dark-mode .window-content {
@@ -256,6 +254,8 @@
             height: 100%;
             border: none;
             background: white;
+            position: relative;
+            z-index: 1;
         }
         
         .dark-mode iframe {
@@ -264,7 +264,7 @@
         
         /* Shelf/Taskbar */
         #shelf {
-            position: absolute;
+            position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
@@ -296,6 +296,8 @@
             cursor: pointer;
             transition: all 0.2s;
             margin-right: 20px;
+            position: relative;
+            z-index: 1001;
         }
         
         #app-launcher:hover {
@@ -310,6 +312,8 @@
             flex: 1;
             overflow-x: auto;
             padding: 0 10px;
+            position: relative;
+            z-index: 1001;
         }
         
         .taskbar-item {
@@ -322,6 +326,7 @@
             cursor: pointer;
             transition: all 0.2s;
             position: relative;
+            z-index: 1001;
         }
         
         .taskbar-item:hover {
@@ -370,6 +375,8 @@
             align-items: center;
             gap: 8px;
             margin-left: auto;
+            position: relative;
+            z-index: 1001;
         }
         
         .system-icon {
@@ -470,7 +477,7 @@
             gap: 10px;
         }
         
-        select, input[type="text"] {
+        select, input[type="text"], input[type="range"] {
             flex: 1;
             padding: 10px;
             border: 1px solid #dadce0;
@@ -481,7 +488,8 @@
         }
         
         .dark-mode select,
-        .dark-mode input[type="text"] {
+        .dark-mode input[type="text"],
+        .dark-mode input[type="range"] {
             border-color: #5f6368;
             background: #3c4043;
         }
@@ -502,6 +510,7 @@
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
+            cursor: pointer;
         }
         
         .checkbox.checked {
@@ -564,33 +573,24 @@
             background: #5f6368;
         }
         
-        /* Icons per row indicator */
-        .icons-per-row-indicator {
+        /* App Launcher */
+        .app-launcher-modal {
             position: fixed;
-            bottom: 70px;
-            right: 20px;
-            background: rgba(255,255,255,0.9);
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: #202124;
-            backdrop-filter: blur(10px);
-            display: none;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
         }
         
-        .dark-mode .icons-per-row-indicator {
-            background: rgba(32,33,36,0.9);
-            color: #e8eaed;
-        }
-        
-        /* Selection rectangle */
-        .selection-rectangle {
-            position: absolute;
-            border: 2px solid var(--primary);
-            background: rgba(66,133,244,0.1);
-            display: none;
-            pointer-events: none;
-            z-index: 999;
+        .dark-mode .app-launcher-modal {
+            background: rgba(32,33,36,0.95);
         }
         
         /* Scrollbar styling */
@@ -629,11 +629,8 @@
 <body class="light-mode">
     <div id="background"></div>
     <div id="desktop">
-        <div class="selection-rectangle" id="selection-rectangle"></div>
         <div class="desktop-icons-grid" id="desktop-icons"></div>
     </div>
-    
-    <div class="icons-per-row-indicator" id="icons-per-row-indicator">Icons per row: 8</div>
     
     <div id="shelf">
         <button id="app-launcher">
@@ -644,10 +641,10 @@
             <div class="system-icon" id="settings-btn" title="Settings">
                 <span class="material-icons">settings</span>
             </div>
-            <div class="system-icon" title="Notifications">
+            <div class="system-icon" id="notifications-btn" title="Notifications">
                 <span class="material-icons">notifications</span>
             </div>
-            <div class="system-icon" title="Account">
+            <div class="system-icon" id="account-btn" title="Account">
                 <span class="material-icons">account_circle</span>
             </div>
             <div id="clock">10:00 AM</div>
@@ -668,7 +665,7 @@
             {
                 id: 'youtube',
                 name: 'YouTube',
-                url: 'https://www.youtube-nocookie.com/embed?max-results=1&rel=0&controls=1&showinfo=1',
+                url: 'https://www.youtube.com',
                 icon: 'play_circle',
                 taskbar: true,
                 desktop: true
@@ -676,7 +673,7 @@
             {
                 id: 'mail',
                 name: 'Email',
-                url: 'https://app.mail.com/',
+                url: 'https://mail.google.com',
                 icon: 'mail',
                 taskbar: true,
                 desktop: true
@@ -684,7 +681,7 @@
             {
                 id: 'drive',
                 name: 'Drive',
-                url: 'https://drive.proton.me/',
+                url: 'https://drive.google.com',
                 icon: 'cloud',
                 taskbar: true,
                 desktop: true
@@ -692,7 +689,7 @@
             {
                 id: 'calculator',
                 name: 'Calculator',
-                url: 'https://wized2.github.io/Calculator',
+                url: 'https://www.online-calculator.com/html5/online-calculator/index.php?v=10',
                 icon: 'calculate',
                 taskbar: true,
                 desktop: true
@@ -700,7 +697,7 @@
             {
                 id: 'clock',
                 name: 'Clock',
-                url: 'https://wized2.github.io/Clock/analog.html',
+                url: 'https://clock.timer.net/',
                 icon: 'schedule',
                 taskbar: true,
                 desktop: true
@@ -708,7 +705,7 @@
             {
                 id: 'notes',
                 name: 'Notes',
-                url: 'https://wized2.github.io/Notes/',
+                url: 'https://notes.io/',
                 icon: 'note',
                 taskbar: true,
                 desktop: true
@@ -716,7 +713,7 @@
             {
                 id: 'maps',
                 name: 'Maps',
-                url: 'https://www.openstreetmap.org/',
+                url: 'https://www.google.com/maps',
                 icon: 'map',
                 taskbar: true,
                 desktop: true
@@ -724,7 +721,7 @@
             {
                 id: 'docs',
                 name: 'Docs',
-                url: 'https://docs.proton.me/',
+                url: 'https://docs.google.com',
                 icon: 'description',
                 taskbar: true,
                 desktop: true
@@ -732,7 +729,7 @@
             {
                 id: 'calendar',
                 name: 'Calendar',
-                url: 'https://calendar.proton.me/',
+                url: 'https://calendar.google.com',
                 icon: 'calendar_today',
                 taskbar: true,
                 desktop: true
@@ -740,7 +737,7 @@
             {
                 id: 'photos',
                 name: 'Photos',
-                url: 'https://pixlr.com/e/',
+                url: 'https://photos.google.com',
                 icon: 'photo',
                 taskbar: true,
                 desktop: true
@@ -748,7 +745,7 @@
             {
                 id: 'music',
                 name: 'Music',
-                url: 'https://music.youtube.com/',
+                url: 'https://music.youtube.com',
                 icon: 'music_note',
                 taskbar: true,
                 desktop: true
@@ -776,9 +773,6 @@
             backgroundUrl: wallpapers[0],
             customBackgroundUrl: ''
         };
-        let isSelecting = false;
-        let selectionStart = { x: 0, y: 0 };
-        let selectedIcons = new Set();
 
         // Load settings from localStorage
         function loadSettings() {
@@ -810,14 +804,6 @@
             const background = document.getElementById('background');
             const bgUrl = settings.customBackgroundUrl || settings.backgroundUrl;
             background.style.backgroundImage = `url('${bgUrl}')`;
-
-            // Apply icons per row
-            document.documentElement.style.setProperty('--icons-per-row', settings.iconsPerRow);
-            updateDesktopIconsLayout();
-            
-            // Update indicator
-            document.getElementById('icons-per-row-indicator').textContent = 
-                `Icons per row: ${settings.iconsPerRow}`;
         }
 
         // Initialize
@@ -830,6 +816,15 @@
             document.getElementById('app-launcher').addEventListener('click', showAppLauncher);
             document.getElementById('settings-btn').addEventListener('click', showSettings);
             
+            // Initialize other system tray buttons
+            document.getElementById('notifications-btn').addEventListener('click', () => {
+                alert('Notifications panel would open here');
+            });
+            
+            document.getElementById('account-btn').addEventListener('click', () => {
+                alert('Account menu would open here');
+            });
+            
             // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
                 if (e.ctrlKey && e.key === 'n') {
@@ -840,41 +835,7 @@
                     e.preventDefault();
                     showSettings();
                 }
-                if (e.key === 'Escape') {
-                    clearSelection();
-                }
             });
-
-            // Desktop selection
-            const desktop = document.getElementById('desktop');
-            desktop.addEventListener('mousedown', startSelection);
-            desktop.addEventListener('mousemove', updateSelection);
-            desktop.addEventListener('mouseup', endSelection);
-
-            // Prevent drag on icon click
-            desktop.addEventListener('dragstart', (e) => e.preventDefault());
-
-            // Update icons layout on resize
-            window.addEventListener('resize', updateDesktopIconsLayout);
-        }
-
-        // Update desktop icons layout
-        function updateDesktopIconsLayout() {
-            const grid = document.getElementById('desktop-icons');
-            const availableWidth = window.innerWidth - (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--desktop-padding')) * 2);
-            const iconSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--icon-size'));
-            const gap = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--icon-gap'));
-            
-            const maxIconsPerRow = Math.floor((availableWidth + gap) / (iconSize + gap));
-            const iconsPerRow = Math.min(settings.iconsPerRow, maxIconsPerRow);
-            
-            document.documentElement.style.setProperty('--icons-per-row', iconsPerRow);
-            
-            // Update indicator
-            const indicator = document.getElementById('icons-per-row-indicator');
-            indicator.textContent = `Icons per row: ${iconsPerRow}`;
-            indicator.style.display = 'block';
-            setTimeout(() => indicator.style.display = 'none', 2000);
         }
 
         // Create desktop icons
@@ -882,124 +843,27 @@
             const container = document.getElementById('desktop-icons');
             container.innerHTML = '';
             
-            apps.forEach((app, index) => {
+            apps.forEach((app) => {
                 if (!app.desktop) return;
                 
                 const icon = document.createElement('div');
                 icon.className = 'desktop-icon';
                 icon.dataset.appId = app.id;
-                icon.dataset.index = index;
-                icon.style.gridColumn = 'auto';
-                icon.style.gridRow = 'auto';
                 
                 icon.innerHTML = `
                     <span class="material-icons">${app.icon}</span>
                     <span>${app.name}</span>
                 `;
                 
+                // Single click to open app
                 icon.addEventListener('click', (e) => {
-                    if (e.shiftKey || e.ctrlKey) {
-                        e.stopPropagation();
-                        toggleIconSelection(icon);
-                    } else if (selectedIcons.size > 0) {
-                        clearSelection();
-                    } else {
-                        openApp(app);
-                    }
+                    e.stopPropagation();
+                    openApp(app);
                 });
-                
-                icon.addEventListener('dblclick', () => openApp(app));
                 
                 container.appendChild(icon);
                 desktopIcons.set(app.id, icon);
             });
-            
-            updateDesktopIconsLayout();
-        }
-
-        // Desktop selection functions
-        function startSelection(e) {
-            if (e.target.closest('.desktop-icon') || e.target.closest('.window')) {
-                isSelecting = false;
-                return;
-            }
-            
-            isSelecting = true;
-            selectionStart = { x: e.clientX, y: e.clientY };
-            const rect = document.getElementById('selection-rectangle');
-            rect.style.display = 'block';
-            rect.style.left = `${e.clientX}px`;
-            rect.style.top = `${e.clientY}px`;
-            rect.style.width = '0';
-            rect.style.height = '0';
-            
-            clearSelection();
-        }
-
-        function updateSelection(e) {
-            if (!isSelecting) return;
-            
-            const rect = document.getElementById('selection-rectangle');
-            const currentX = e.clientX;
-            const currentY = e.clientY;
-            
-            const left = Math.min(selectionStart.x, currentX);
-            const top = Math.min(selectionStart.y, currentY);
-            const width = Math.abs(currentX - selectionStart.x);
-            const height = Math.abs(currentY - selectionStart.y);
-            
-            rect.style.left = `${left}px`;
-            rect.style.top = `${top}px`;
-            rect.style.width = `${width}px`;
-            rect.style.height = `${height}px`;
-            
-            // Update selection
-            updateIconSelection(rect.getBoundingClientRect());
-        }
-
-        function endSelection() {
-            isSelecting = false;
-            const rect = document.getElementById('selection-rectangle');
-            rect.style.display = 'none';
-        }
-
-        function updateIconSelection(selectionRect) {
-            desktopIcons.forEach(icon => {
-                const iconRect = icon.getBoundingClientRect();
-                const isSelected = (
-                    iconRect.left < selectionRect.right &&
-                    iconRect.right > selectionRect.left &&
-                    iconRect.top < selectionRect.bottom &&
-                    iconRect.bottom > selectionRect.top
-                );
-                
-                if (isSelected) {
-                    icon.classList.add('selected');
-                    selectedIcons.add(icon.dataset.appId);
-                } else {
-                    icon.classList.remove('selected');
-                    selectedIcons.delete(icon.dataset.appId);
-                }
-            });
-        }
-
-        function toggleIconSelection(icon) {
-            const appId = icon.dataset.appId;
-            if (selectedIcons.has(appId)) {
-                icon.classList.remove('selected');
-                selectedIcons.delete(appId);
-            } else {
-                icon.classList.add('selected');
-                selectedIcons.add(appId);
-            }
-        }
-
-        function clearSelection() {
-            selectedIcons.forEach(appId => {
-                const icon = desktopIcons.get(appId);
-                if (icon) icon.classList.remove('selected');
-            });
-            selectedIcons.clear();
         }
 
         // Open app window
@@ -1062,7 +926,7 @@
                 </div>
                 <div class="window-content">
                     <iframe src="${app.url}" title="${app.name}" 
-                            sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-presentation"
+                            sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"
                             allowfullscreen></iframe>
                 </div>
             `;
@@ -1270,28 +1134,15 @@
         function showAppLauncher() {
             // Create launcher modal
             const launcher = document.createElement('div');
-            launcher.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(255,255,255,0.95);
-                backdrop-filter: blur(20px);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                z-index: 9999;
-            `;
+            launcher.className = 'app-launcher-modal';
             
             launcher.innerHTML = `
                 <div style="width: 600px; max-width: 90%;">
                     <div style="margin-bottom: 40px; text-align: center;">
-                        <h2 style="color: #202124; margin-bottom: 20px;">Applications</h2>
+                        <h2 style="color: var(--on-surface); margin-bottom: 20px;">Applications</h2>
                         <div style="display: grid; grid-template-columns: repeat(auto-fill, 100px); gap: 20px; justify-content: center;">
                             ${apps.map(app => `
-                                <div class="desktop-icon" style="color: #202124; cursor: pointer; padding: 15px;" data-app-id="${app.id}">
+                                <div class="desktop-icon" style="color: var(--on-surface); cursor: pointer; padding: 15px;" data-app-id="${app.id}">
                                     <span class="material-icons" style="font-size: 36px;">${app.icon}</span>
                                     <span style="margin-top: 5px; font-size: 12px;">${app.name}</span>
                                 </div>
@@ -1299,7 +1150,7 @@
                         </div>
                     </div>
                     <div style="text-align: center;">
-                        <button id="close-launcher" style="padding: 10px 30px; background: #4285f4; color: white; border: none; border-radius: 24px; cursor: pointer; font-size: 14px;">
+                        <button id="close-launcher" style="padding: 10px 30px; background: var(--primary); color: white; border: none; border-radius: 24px; cursor: pointer; font-size: 14px;">
                             Close
                         </button>
                     </div>
@@ -1311,6 +1162,7 @@
             // Add click handlers for apps
             launcher.querySelectorAll('.desktop-icon').forEach(icon => {
                 icon.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     const appId = e.currentTarget.dataset.appId;
                     const app = apps.find(a => a.id === appId);
                     if (app) {
@@ -1321,7 +1173,8 @@
             });
             
             // Close button
-            launcher.querySelector('#close-launcher').addEventListener('click', () => {
+            launcher.querySelector('#close-launcher').addEventListener('click', (e) => {
+                e.stopPropagation();
                 launcher.remove();
             });
             
@@ -1353,14 +1206,6 @@
                                 <option value="light">Light</option>
                                 <option value="dark">Dark</option>
                             </select>
-                        </div>
-                    </div>
-                    
-                    <div class="setting-item">
-                        <label class="setting-label">Icons per Row</label>
-                        <div class="setting-control">
-                            <input type="range" id="icons-per-row-slider" min="4" max="12" step="1" value="${settings.iconsPerRow}">
-                            <span id="icons-per-row-value">${settings.iconsPerRow}</span>
                         </div>
                     </div>
                     
@@ -1414,7 +1259,6 @@
             document.getElementById('save-settings').addEventListener('click', () => {
                 // Get values
                 settings.theme = document.getElementById('theme-select').value;
-                settings.iconsPerRow = parseInt(document.getElementById('icons-per-row-slider').value);
                 settings.backgroundUrl = document.getElementById('wallpaper-select').value || wallpapers[0];
                 settings.customBackgroundUrl = document.getElementById('custom-wallpaper-url').value;
                 
@@ -1428,13 +1272,6 @@
                 modal.remove();
             });
             
-            // Update icons per row value display
-            const slider = document.getElementById('icons-per-row-slider');
-            const valueDisplay = document.getElementById('icons-per-row-value');
-            slider.addEventListener('input', () => {
-                valueDisplay.textContent = slider.value;
-            });
-            
             // Toggle custom URL checkbox
             document.getElementById('use-custom-url').addEventListener('click', function() {
                 this.classList.toggle('checked');
@@ -1444,780 +1281,6 @@
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) {
                     modal.remove();
-                }
-            });
-        }
-
-        // Update clock
-        function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString([], { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
-            document.getElementById('clock').textContent = timeString;
-        }
-
-        // Initialize on load
-        window.addEventListener('load', init);
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chrome OS Desktop</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #4285f4;
-            --surface: #f1f3f4;
-            --on-surface: #202124;
-            --elevation-2: 0 3px 6px rgba(0,0,0,0.1);
-            --elevation-3: 0 8px 24px rgba(0,0,0,0.2);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        /* Desktop */
-        #desktop {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 56px;
-            overflow: hidden;
-            padding: 20px;
-        }
-        
-        .desktop-icons {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            z-index: 10;
-        }
-        
-        .desktop-icon {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 80px;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: white;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        }
-        
-        .desktop-icon:hover {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-        }
-        
-        .desktop-icon .material-icons {
-            font-size: 40px;
-            margin-bottom: 5px;
-            background: rgba(255,255,255,0.9);
-            padding: 10px;
-            border-radius: 8px;
-            color: #4285f4;
-        }
-        
-        .desktop-icon span {
-            font-size: 12px;
-            text-align: center;
-        }
-        
-        /* Windows */
-        .window {
-            position: absolute;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: var(--elevation-3);
-            min-width: 400px;
-            min-height: 300px;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #dadce0;
-            resize: both;
-            max-width: calc(100vw - 40px);
-            max-height: calc(100vh - 96px);
-        }
-        
-        .window.maximized {
-            width: calc(100vw - 40px) !important;
-            height: calc(100vh - 96px) !important;
-            top: 20px !important;
-            left: 20px !important;
-            border-radius: 0;
-            resize: none;
-        }
-        
-        .window.minimized {
-            display: none;
-        }
-        
-        .title-bar {
-            height: 40px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dadce0;
-            display: flex;
-            align-items: center;
-            padding: 0 12px;
-            cursor: move;
-            user-select: none;
-        }
-        
-        .window-icon {
-            width: 20px;
-            height: 20px;
-            margin-right: 8px;
-            color: #5f6368;
-        }
-        
-        .title-text {
-            flex: 1;
-            font-size: 14px;
-            font-weight: 500;
-            color: #3c4043;
-        }
-        
-        .window-controls {
-            display: flex;
-            gap: 4px;
-        }
-        
-        .win-btn {
-            width: 32px;
-            height: 32px;
-            border: none;
-            background: none;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-        
-        .win-btn:hover {
-            background: rgba(0,0,0,0.1);
-        }
-        
-        .win-btn.close:hover {
-            background: #d93025;
-            color: white;
-        }
-        
-        .window-content {
-            flex: 1;
-            overflow: hidden;
-            background: white;
-        }
-        
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: white;
-        }
-        
-        /* Shelf/Taskbar */
-        #shelf {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 56px;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid #e0e0e0;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            z-index: 1000;
-        }
-        
-        #app-launcher {
-            width: 48px;
-            height: 48px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-right: 20px;
-        }
-        
-        #app-launcher:hover {
-            background: #3367d6;
-            transform: scale(1.05);
-        }
-        
-        #taskbar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex: 1;
-            overflow-x: auto;
-            padding: 0 10px;
-        }
-        
-        .taskbar-item {
-            width: 48px;
-            height: 48px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-        }
-        
-        .taskbar-item:hover {
-            background: rgba(0,0,0,0.05);
-        }
-        
-        .taskbar-item.active {
-            background: rgba(66,133,244,0.1);
-        }
-        
-        .taskbar-item.active::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 16px;
-            height: 3px;
-            background: var(--primary);
-            border-radius: 2px;
-        }
-        
-        .taskbar-item .material-icons {
-            font-size: 24px;
-            color: #5f6368;
-        }
-        
-        .taskbar-item.active .material-icons {
-            color: var(--primary);
-        }
-        
-        #system-tray {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: auto;
-        }
-        
-        .system-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        
-        .system-icon:hover {
-            background: rgba(0,0,0,0.05);
-        }
-        
-        .system-icon .material-icons {
-            font-size: 20px;
-            color: #5f6368;
-        }
-        
-        #clock {
-            font-size: 14px;
-            font-weight: 500;
-            color: #3c4043;
-            margin-left: 16px;
-        }
-        
-        /* Scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.05);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0,0,0,0.2);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0,0,0,0.3);
-        }
-    </style>
-</head>
-<body>
-    <div id="desktop">
-        <div class="desktop-icons" id="desktop-icons"></div>
-    </div>
-    
-    <div id="shelf">
-        <button id="app-launcher">
-            <span class="material-icons">apps</span>
-        </button>
-        <div id="taskbar"></div>
-        <div id="system-tray">
-            <div class="system-icon" title="Settings">
-                <span class="material-icons">settings</span>
-            </div>
-            <div class="system-icon" title="Notifications">
-                <span class="material-icons">notifications</span>
-            </div>
-            <div class="system-icon" title="Account">
-                <span class="material-icons">account_circle</span>
-            </div>
-            <div id="clock">10:00 AM</div>
-        </div>
-    </div>
-
-    <script>
-        // Apps configuration
-        const apps = [
-            {
-                id: 'chrome',
-                name: 'Chrome',
-                url: 'https://www.google.com/webhp?igu=1',
-                icon: 'language',
-                taskbar: true
-            },
-            {
-                id: 'youtube',
-                name: 'YouTube',
-                url: 'https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwjqwPeZmcKSAxXiU6QEHfM-BlIQFnoECBYQAQ&url=https%3A%2F%2Fwww.youtube.com%2F&usg=AOvVaw0usXxGa_x5y1xoI_LaL0-1&opi=89978449',
-                icon: 'play_circle',
-                taskbar: true
-            },
-            {
-                id: 'gmail',
-                name: 'Gmail',
-                url: 'https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwjH4f_ImcKSAxV0RKQEHa9kIswQFnoECAwQAQ&url=https%3A%2F%2Fmail.google.com%2Fmail%2Fu%2F0%2F&usg=AOvVaw1GRqnzaEzJ-JntPiR5Sc98&opi=89978449',
-                icon: 'mail',
-                taskbar: true
-            },
-            {
-                id: 'calculator',
-                name: 'Calculator',
-                url: 'https://wized2.github.io/Calculator',
-                icon: 'calculate',
-                taskbar: true
-            },
-            {
-                id: 'clock',
-                name: 'Clock',
-                url: 'https://wized2.github.io/Clock/analog.html',
-                icon: 'schedule',
-                taskbar: true
-            },
-            {
-                id: 'note',
-                name: 'Notes',
-                url: 'https://wized2.github.io/Notes/',
-                icon: 'note',
-                taskbar: true
-            }
-        ];
-
-        // State management
-        const windows = new Map();
-        const taskbarItems = new Map();
-        let windowZIndex = 100;
-        let activeWindow = null;
-
-        // Initialize
-        function init() {
-            createDesktopIcons();
-            updateClock();
-            setInterval(updateClock, 60000);
-            
-            document.getElementById('app-launcher').addEventListener('click', showAppLauncher);
-            
-            // Keyboard shortcuts
-            document.addEventListener('keydown', (e) => {
-                if (e.ctrlKey && e.key === 'n') {
-                    e.preventDefault();
-                    openApp(apps[0]); // Open Chrome
-                }
-            });
-        }
-
-        // Create desktop icons
-        function createDesktopIcons() {
-            const container = document.getElementById('desktop-icons');
-            apps.forEach(app => {
-                if (!app.taskbar) return;
-                
-                const icon = document.createElement('div');
-                icon.className = 'desktop-icon';
-                icon.innerHTML = `
-                    <span class="material-icons">${app.icon}</span>
-                    <span>${app.name}</span>
-                `;
-                icon.addEventListener('click', () => openApp(app));
-                container.appendChild(icon);
-            });
-        }
-
-        // Open app window
-        function openApp(app) {
-            let window = windows.get(app.id);
-            
-            if (window) {
-                // Bring to front if window exists
-                bringToFront(window);
-                if (window.classList.contains('minimized')) {
-                    window.classList.remove('minimized');
-                }
-            } else {
-                // Create new window
-                window = createWindow(app);
-                windows.set(app.id, window);
-                document.getElementById('desktop').appendChild(window);
-                
-                // Create taskbar item
-                createTaskbarItem(app, window);
-            }
-            
-            // Update active window
-            setActiveWindow(window);
-            
-            return window;
-        }
-
-        // Create window
-        function createWindow(app) {
-            const windowId = `window_${app.id}_${Date.now()}`;
-            const window = document.createElement('div');
-            window.className = 'window';
-            window.id = windowId;
-            window.dataset.appId = app.id;
-            
-            // Position window
-            const offset = windows.size * 30;
-            window.style.left = `${50 + offset}px`;
-            window.style.top = `${50 + offset}px`;
-            window.style.width = '800px';
-            window.style.height = '600px';
-            window.style.zIndex = windowZIndex++;
-            
-            window.innerHTML = `
-                <div class="title-bar">
-                    <span class="material-icons window-icon">${app.icon}</span>
-                    <span class="title-text">${app.name}</span>
-                    <div class="window-controls">
-                        <button class="win-btn minimize" title="Minimize">
-                            <span class="material-icons">minimize</span>
-                        </button>
-                        <button class="win-btn maximize" title="Maximize">
-                            <span class="material-icons">crop_square</span>
-                        </button>
-                        <button class="win-btn close" title="Close">
-                            <span class="material-icons">close</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="window-content">
-                    <iframe src="${app.url}" title="${app.name}" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"></iframe>
-                </div>
-            `;
-            
-            // Add event listeners for window controls
-            const titleBar = window.querySelector('.title-bar');
-            const minimizeBtn = window.querySelector('.minimize');
-            const maximizeBtn = window.querySelector('.maximize');
-            const closeBtn = window.querySelector('.close');
-            
-            // Make draggable
-            makeDraggable(window, titleBar);
-            
-            // Make resizable
-            makeResizable(window);
-            
-            // Window controls
-            minimizeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                minimizeWindow(window);
-            });
-            
-            maximizeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleMaximize(window);
-            });
-            
-            closeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                closeWindow(window);
-            });
-            
-            // Click to focus
-            window.addEventListener('mousedown', () => {
-                bringToFront(window);
-            });
-            
-            return window;
-        }
-
-        // Make window draggable
-        function makeDraggable(window, handle) {
-            let isDragging = false;
-            let startX, startY, startLeft, startTop;
-            
-            handle.addEventListener('mousedown', startDrag);
-            
-            function startDrag(e) {
-                if (e.target.closest('.win-btn')) return;
-                
-                isDragging = true;
-                bringToFront(window);
-                
-                const rect = window.getBoundingClientRect();
-                startX = e.clientX;
-                startY = e.clientY;
-                startLeft = rect.left;
-                startTop = rect.top;
-                
-                document.addEventListener('mousemove', drag);
-                document.addEventListener('mouseup', stopDrag);
-            }
-            
-            function drag(e) {
-                if (!isDragging) return;
-                
-                e.preventDefault();
-                
-                let newX = startLeft + (e.clientX - startX);
-                let newY = startTop + (e.clientY - startY);
-                
-                // Boundary checking
-                const desktop = document.getElementById('desktop');
-                const maxX = desktop.clientWidth - window.clientWidth;
-                const maxY = desktop.clientHeight - window.clientHeight;
-                
-                newX = Math.max(0, Math.min(newX, maxX));
-                newY = Math.max(0, Math.min(newY, maxY));
-                
-                window.style.left = `${newX}px`;
-                window.style.top = `${newY}px`;
-            }
-            
-            function stopDrag() {
-                isDragging = false;
-                document.removeEventListener('mousemove', drag);
-                document.removeEventListener('mouseup', stopDrag);
-            }
-        }
-
-        // Make window resizable
-        function makeResizable(window) {
-            const resizeHandle = 10;
-            
-            window.addEventListener('mousedown', (e) => {
-                if (e.offsetX > window.offsetWidth - resizeHandle && 
-                    e.offsetY > window.offsetHeight - resizeHandle) {
-                    
-                    e.preventDefault();
-                    
-                    let startX = e.clientX;
-                    let startY = e.clientY;
-                    let startWidth = window.offsetWidth;
-                    let startHeight = window.offsetHeight;
-                    
-                    function resize(e) {
-                        const newWidth = startWidth + (e.clientX - startX);
-                        const newHeight = startHeight + (e.clientY - startY);
-                        
-                        window.style.width = `${Math.max(400, newWidth)}px`;
-                        window.style.height = `${Math.max(300, newHeight)}px`;
-                    }
-                    
-                    function stopResize() {
-                        document.removeEventListener('mousemove', resize);
-                        document.removeEventListener('mouseup', stopResize);
-                    }
-                    
-                    document.addEventListener('mousemove', resize);
-                    document.addEventListener('mouseup', stopResize);
-                }
-            });
-        }
-
-        // Create taskbar item
-        function createTaskbarItem(app, window) {
-            const taskbar = document.getElementById('taskbar');
-            const item = document.createElement('div');
-            item.className = 'taskbar-item';
-            item.dataset.appId = app.id;
-            
-            item.innerHTML = `<span class="material-icons">${app.icon}</span>`;
-            
-            item.addEventListener('click', () => {
-                if (window.classList.contains('minimized')) {
-                    // Restore window
-                    window.classList.remove('minimized');
-                    bringToFront(window);
-                } else {
-                    // Minimize window
-                    minimizeWindow(window);
-                }
-            });
-            
-            taskbar.appendChild(item);
-            taskbarItems.set(app.id, { item, window });
-        }
-
-        // Window management functions
-        function minimizeWindow(window) {
-            window.classList.add('minimized');
-            updateTaskbarItem(window.dataset.appId, false);
-        }
-
-        function toggleMaximize(window) {
-            window.classList.toggle('maximized');
-            const icon = window.querySelector('.maximize .material-icons');
-            icon.textContent = window.classList.contains('maximized') ? 'filter_none' : 'crop_square';
-        }
-
-        function closeWindow(window) {
-            const appId = window.dataset.appId;
-            
-            // Remove window
-            window.remove();
-            windows.delete(appId);
-            
-            // Remove taskbar item
-            const taskbarItem = taskbarItems.get(appId);
-            if (taskbarItem) {
-                taskbarItem.item.remove();
-                taskbarItems.delete(appId);
-            }
-        }
-
-        function bringToFront(window) {
-            window.style.zIndex = windowZIndex++;
-            setActiveWindow(window);
-        }
-
-        function setActiveWindow(window) {
-            if (activeWindow) {
-                activeWindow.classList.remove('active');
-            }
-            
-            window.classList.add('active');
-            activeWindow = window;
-            
-            // Update taskbar
-            updateTaskbarItem(window.dataset.appId, true);
-        }
-
-        function updateTaskbarItem(appId, isActive) {
-            const taskbarItem = taskbarItems.get(appId);
-            if (taskbarItem) {
-                if (isActive) {
-                    taskbarItem.item.classList.add('active');
-                } else {
-                    taskbarItem.item.classList.remove('active');
-                }
-            }
-        }
-
-        // Show app launcher
-        function showAppLauncher() {
-            // Create launcher modal
-            const launcher = document.createElement('div');
-            launcher.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(255,255,255,0.95);
-                backdrop-filter: blur(20px);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                z-index: 9999;
-            `;
-            
-            launcher.innerHTML = `
-                <div style="width: 600px; max-width: 90%;">
-                    <div style="margin-bottom: 40px; text-align: center;">
-                        <h2 style="color: #202124; margin-bottom: 20px;">Applications</h2>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fill, 100px); gap: 20px; justify-content: center;">
-                            ${apps.map(app => `
-                                <div class="desktop-icon" style="color: #202124; cursor: pointer; padding: 15px;" data-app-id="${app.id}">
-                                    <span class="material-icons" style="font-size: 36px;">${app.icon}</span>
-                                    <span style="margin-top: 5px; font-size: 12px;">${app.name}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    <div style="text-align: center;">
-                        <button id="close-launcher" style="padding: 10px 30px; background: #4285f4; color: white; border: none; border-radius: 24px; cursor: pointer; font-size: 14px;">
-                            Close
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(launcher);
-            
-            // Add click handlers for apps
-            launcher.querySelectorAll('.desktop-icon').forEach(icon => {
-                icon.addEventListener('click', (e) => {
-                    const appId = e.currentTarget.dataset.appId;
-                    const app = apps.find(a => a.id === appId);
-                    if (app) {
-                        openApp(app);
-                        launcher.remove();
-                    }
-                });
-            });
-            
-            // Close button
-            launcher.querySelector('#close-launcher').addEventListener('click', () => {
-                launcher.remove();
-            });
-            
-            // Close on background click
-            launcher.addEventListener('click', (e) => {
-                if (e.target === launcher) {
-                    launcher.remove();
                 }
             });
         }
