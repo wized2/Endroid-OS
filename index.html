@@ -3,19 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chrome OS Desktop</title>
+    <title>Endroid OS - Chrome OS Desktop</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- JSZip for EPK extraction -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <style>
         :root {
             --primary: #4285f4;
+            --primary-dark: #3367d6;
+            --primary-light: #8ab4f8;
             --surface: #f1f3f4;
+            --surface-dark: #202124;
             --on-surface: #202124;
+            --on-surface-dark: #e8eaed;
             --elevation-2: 0 3px 6px rgba(0,0,0,0.1);
             --elevation-3: 0 8px 24px rgba(0,0,0,0.2);
+            --success: #34a853;
+            --error: #ea4335;
+            --warning: #fbbc04;
+            --border-radius: 12px;
         }
 
         .dark-mode {
@@ -40,6 +50,8 @@
             transition: background 0.3s ease;
             touch-action: none;
             user-select: none;
+            background: var(--surface);
+            color: var(--on-surface);
         }
         
         /* Background */
@@ -85,25 +97,30 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px 8px;
+            border-radius: var(--border-radius);
             cursor: pointer;
             transition: all 0.2s;
             color: white;
             text-shadow: 0 1px 3px rgba(0,0,0,0.8);
             background: rgba(0,0,0,0.2);
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(10px);
             user-select: none;
             text-decoration: none;
+            border: 1px solid rgba(255,255,255,0.1);
+            min-width: 80px;
+            max-width: 90px;
         }
         
         .desktop-icon:hover {
             background: rgba(255,255,255,0.3);
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
         .desktop-icon:active {
             transform: translateY(0);
+            transition: transform 0.1s;
         }
         
         .desktop-icon .material-icons {
@@ -111,13 +128,27 @@
             margin-bottom: 8px;
             background: rgba(255,255,255,0.9);
             padding: 10px;
-            border-radius: 8px;
+            border-radius: 10px;
             color: #4285f4;
         }
         
         .dark-mode .desktop-icon .material-icons {
             background: rgba(255,255,255,0.1);
             color: #8ab4f8;
+        }
+        
+        .desktop-icon img.icon-image {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 8px;
+            object-fit: contain;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.9);
+            padding: 8px;
+        }
+        
+        .dark-mode .desktop-icon img.icon-image {
+            background: rgba(255,255,255,0.1);
         }
         
         .desktop-icon span {
@@ -128,30 +159,36 @@
             text-overflow: ellipsis;
             max-width: 100%;
             padding: 0 4px;
+            white-space: nowrap;
         }
         
         /* Windows */
         .window {
             position: absolute;
             background: var(--surface);
-            border-radius: 12px;
+            border-radius: var(--border-radius);
             overflow: hidden;
             box-shadow: var(--elevation-3);
             min-width: 400px;
             min-height: 300px;
             display: flex;
             flex-direction: column;
-            border: 1px solid #dadce0;
+            border: 1px solid rgba(0,0,0,0.1);
             resize: both;
             max-width: calc(100vw - 40px);
             max-height: calc(100vh - 96px);
             color: var(--on-surface);
             z-index: 100;
             touch-action: none;
+            transition: box-shadow 0.2s;
+        }
+
+        .window:hover {
+            box-shadow: 0 12px 32px rgba(0,0,0,0.15);
         }
         
         .dark-mode .window {
-            border-color: #5f6368;
+            border-color: rgba(255,255,255,0.1);
         }
         
         .window.maximized {
@@ -169,6 +206,7 @@
         
         .window.active {
             z-index: 200;
+            border-color: var(--primary);
         }
         
         .title-bar {
@@ -195,6 +233,20 @@
             height: 20px;
             margin-right: 8px;
             color: #5f6368;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .window-icon .material-icons {
+            font-size: 18px;
+        }
+        
+        .window-icon img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            border-radius: 4px;
         }
         
         .dark-mode .window-icon {
@@ -230,7 +282,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s;
+            transition: all 0.2s;
             color: #5f6368;
             position: relative;
             z-index: 102;
@@ -288,7 +340,7 @@
             height: 56px;
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(20px);
-            border-top: 1px solid #e0e0e0;
+            border-top: 1px solid rgba(0,0,0,0.1);
             display: flex;
             align-items: center;
             padding: 0 20px;
@@ -297,7 +349,7 @@
         
         .dark-mode #shelf {
             background: rgba(32,33,36,0.95);
-            border-color: #5f6368;
+            border-color: rgba(255,255,255,0.1);
         }
         
         #app-launcher {
@@ -316,11 +368,13 @@
             position: relative;
             z-index: 1001;
             touch-action: manipulation;
+            box-shadow: 0 2px 8px rgba(66,133,244,0.3);
         }
         
         #app-launcher:hover {
-            background: #3367d6;
+            background: var(--primary-dark);
             transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(66,133,244,0.4);
         }
         
         #taskbar {
@@ -353,6 +407,7 @@
             z-index: 1001;
             flex-shrink: 0;
             touch-action: manipulation;
+            background: transparent;
         }
         
         .taskbar-item:hover {
@@ -390,6 +445,13 @@
         
         .dark-mode .taskbar-item .material-icons {
             color: #e8eaed;
+        }
+        
+        .taskbar-item img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            border-radius: 4px;
         }
         
         .taskbar-item.active .material-icons {
@@ -447,6 +509,11 @@
             color: white;
             font-weight: 500;
             font-size: 14px;
+            border: 2px solid white;
+        }
+        
+        .dark-mode .user-avatar {
+            border-color: #202124;
         }
         
         .user-avatar img {
@@ -461,10 +528,16 @@
             color: #3c4043;
             margin-left: 16px;
             white-space: nowrap;
+            padding: 6px 12px;
+            background: rgba(0,0,0,0.03);
+            border-radius: 8px;
+            min-width: 80px;
+            text-align: center;
         }
         
         .dark-mode #clock {
             color: #e8eaed;
+            background: rgba(255,255,255,0.05);
         }
         
         /* Settings Modal */
@@ -477,16 +550,16 @@
             max-width: 90%;
             max-height: 90vh;
             background: var(--surface);
-            border-radius: 12px;
+            border-radius: var(--border-radius);
             box-shadow: var(--elevation-3);
             z-index: 2000;
             color: var(--on-surface);
-            border: 1px solid #dadce0;
+            border: 1px solid rgba(0,0,0,0.1);
             overflow: hidden;
         }
         
         .dark-mode .settings-modal {
-            border-color: #5f6368;
+            border-color: rgba(255,255,255,0.1);
         }
         
         .modal-header {
@@ -496,10 +569,12 @@
             justify-content: space-between;
             align-items: center;
             flex-shrink: 0;
+            background: rgba(0,0,0,0.02);
         }
         
         .dark-mode .modal-header {
             border-color: #5f6368;
+            background: rgba(255,255,255,0.03);
         }
         
         .modal-title {
@@ -533,13 +608,19 @@
         
         select, input[type="text"], input[type="range"] {
             flex: 1;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid #dadce0;
             border-radius: 8px;
             background: var(--surface);
             color: var(--on-surface);
             font-family: 'Roboto', sans-serif;
             font-size: 14px;
+            transition: border 0.2s;
+        }
+        
+        select:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
         }
         
         .dark-mode select,
@@ -588,10 +669,12 @@
             justify-content: flex-end;
             gap: 10px;
             flex-shrink: 0;
+            background: rgba(0,0,0,0.02);
         }
         
         .dark-mode .modal-footer {
             border-color: #5f6368;
+            background: rgba(255,255,255,0.03);
         }
         
         .btn {
@@ -601,7 +684,7 @@
             cursor: pointer;
             font-family: 'Roboto', sans-serif;
             font-weight: 500;
-            transition: background 0.2s;
+            transition: all 0.2s;
             font-size: 14px;
             touch-action: manipulation;
         }
@@ -612,7 +695,8 @@
         }
         
         .btn-primary:hover {
-            background: #3367d6;
+            background: var(--primary-dark);
+            transform: translateY(-1px);
         }
         
         .btn-secondary {
@@ -647,6 +731,12 @@
             align-items: center;
             justify-content: center;
             z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         .dark-mode .app-launcher-modal {
@@ -662,16 +752,22 @@
             width: 400px;
             max-width: 90%;
             background: var(--surface);
-            border-radius: 12px;
+            border-radius: var(--border-radius);
             box-shadow: var(--elevation-3);
             z-index: 2000;
             color: var(--on-surface);
-            border: 1px solid #dadce0;
+            border: 1px solid rgba(0,0,0,0.1);
             overflow: hidden;
+            animation: scaleIn 0.3s ease;
+        }
+        
+        @keyframes scaleIn {
+            from { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
         
         .dark-mode .account-modal {
-            border-color: #5f6368;
+            border-color: rgba(255,255,255,0.1);
         }
         
         .account-header {
@@ -679,10 +775,12 @@
             border-bottom: 1px solid #dadce0;
             text-align: center;
             position: relative;
+            background: rgba(0,0,0,0.02);
         }
         
         .dark-mode .account-header {
             border-color: #5f6368;
+            background: rgba(255,255,255,0.03);
         }
         
         .account-title {
@@ -731,6 +829,11 @@
             font-weight: 500;
             font-size: 24px;
             flex-shrink: 0;
+            border: 3px solid white;
+        }
+        
+        .dark-mode .user-avatar-large {
+            border-color: #202124;
         }
         
         .user-avatar-large img {
@@ -798,6 +901,7 @@
         .login-btn:hover {
             background: #f8f9fa;
             border-color: #c1c1c1;
+            transform: translateY(-1px);
         }
         
         .dark-mode .login-btn:hover {
@@ -841,11 +945,13 @@
             text-align: center;
             font-size: 12px;
             color: #5f6368;
+            background: rgba(0,0,0,0.02);
         }
         
         .dark-mode .account-footer {
             border-color: #5f6368;
             color: #9aa0a6;
+            background: rgba(255,255,255,0.03);
         }
         
         /* Loading Spinner */
@@ -907,8 +1013,10 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.5);
             z-index: 1999;
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
         }
         
         /* Drag/resize handle */
@@ -920,6 +1028,513 @@
             height: 15px;
             cursor: nwse-resize;
             z-index: 101;
+            background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.1) 50%);
+        }
+        
+        /* App Installer Styles */
+        .app-installer-content {
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow-y: auto;
+            background: var(--surface);
+        }
+        
+        .installer-section {
+            background: rgba(0,0,0,0.02);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .dark-mode .installer-section {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.1);
+        }
+        
+        .installer-section h3 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            color: var(--on-surface);
+            font-size: 18px;
+        }
+        
+        .installer-section h3 .material-icons {
+            font-size: 24px;
+            color: var(--primary);
+        }
+        
+        .drop-zone {
+            border: 2px dashed #dadce0;
+            border-radius: var(--border-radius);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255,255,255,0.5);
+        }
+        
+        .dark-mode .drop-zone {
+            border-color: #5f6368;
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--primary);
+            background: rgba(66,133,244,0.05);
+            transform: translateY(-2px);
+        }
+        
+        .drop-zone .material-icons {
+            font-size: 48px;
+            color: #5f6368;
+            margin-bottom: 16px;
+            opacity: 0.7;
+        }
+        
+        .dark-mode .drop-zone .material-icons {
+            color: #9aa0a6;
+        }
+        
+        .drop-zone h4 {
+            font-size: 16px;
+            color: var(--on-surface);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .drop-zone p {
+            color: #5f6368;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .progress-container {
+            background: rgba(0,0,0,0.05);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .dark-mode .progress-container {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: #f1f3f4;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .dark-mode .progress-bar {
+            background: #5f6368;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .result-message {
+            padding: 16px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .result-success {
+            background: #e6f4ea;
+            border-left: 4px solid var(--success);
+        }
+        
+        .result-error {
+            background: #fce8e6;
+            border-left: 4px solid var(--error);
+        }
+        
+        .dark-mode .result-success {
+            background: rgba(52,168,83,0.1);
+        }
+        
+        .dark-mode .result-error {
+            background: rgba(234,67,53,0.1);
+        }
+        
+        .custom-apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .custom-app-card {
+            background: rgba(255,255,255,0.8);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .dark-mode .custom-app-card {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.1);
+        }
+        
+        .custom-app-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--elevation-2);
+            background: rgba(255,255,255,0.9);
+            border-color: var(--primary);
+        }
+        
+        .dark-mode .custom-app-card:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        .custom-app-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            overflow: hidden;
+        }
+        
+        .custom-app-icon .material-icons {
+            font-size: 24px;
+        }
+        
+        .custom-app-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        
+        .custom-app-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--on-surface);
+            text-align: center;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .custom-app-version {
+            font-size: 10px;
+            color: #5f6368;
+            background: rgba(0,0,0,0.05);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        
+        .dark-mode .custom-app-version {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .uninstall-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #fce8e6;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d93025;
+            font-size: 16px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .custom-app-card:hover .uninstall-btn {
+            opacity: 1;
+        }
+        
+        .guide-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .step-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+        
+        .step-content h4 {
+            color: var(--on-surface);
+            margin-bottom: 8px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .step-content p {
+            color: #5f6368;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        
+        code, pre {
+            font-family: 'Roboto Mono', monospace;
+            background: rgba(0,0,0,0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        
+        .dark-mode code, .dark-mode pre {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        pre {
+            padding: 12px;
+            overflow-x: auto;
+            margin: 8px 0;
+            border-radius: 6px;
+        }
+        
+        .file-rename {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+        
+        .dark-mode .file-rename {
+            background: #3c4043;
+        }
+        
+        .info-box {
+            background: #e8f0fe;
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .dark-mode .info-box {
+            background: rgba(66,133,244,0.1);
+        }
+        
+        .info-box .material-icons {
+            color: #1967d2;
+        }
+        
+        .dark-mode .info-box .material-icons {
+            color: #8ab4f8;
+        }
+        
+        .installer-footer {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #dadce0;
+            color: #5f6368;
+            font-size: 12px;
+            margin-top: auto;
+        }
+        
+        /* Material Icons Preview */
+        .material-icons-preview {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 8px;
+            background: rgba(0,0,0,0.02);
+            border-radius: 8px;
+        }
+        
+        .dark-mode .material-icons-preview {
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .icon-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .icon-option:hover {
+            background: rgba(66,133,244,0.1);
+            transform: scale(1.05);
+        }
+        
+        .icon-option .material-icons {
+            font-size: 24px;
+            margin-bottom: 4px;
+            color: #5f6368;
+        }
+        
+        .dark-mode .icon-option .material-icons {
+            color: #e8eaed;
+        }
+        
+        .icon-option span {
+            font-size: 10px;
+            color: #5f6368;
+            text-align: center;
+            word-break: break-all;
+        }
+        
+        .dark-mode .icon-option span {
+            color: #9aa0a6;
+        }
+
+        /* Empty state for custom apps */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #5f6368;
+        }
+
+        .empty-state .material-icons {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        /* Custom app iframe container */
+        .custom-app-container {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        .dark-mode .custom-app-container {
+            background: #202124;
+        }
+
+        /* App loading error */
+        .app-error {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .app-error .material-icons {
+            font-size: 48px;
+            color: #ea4335;
+            margin-bottom: 16px;
+        }
+
+        .app-error h3 {
+            color: var(--on-surface);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .app-error p {
+            color: #5f6368;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Quick actions */
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .quick-action-btn {
+            padding: 8px 16px;
+            background: rgba(0,0,0,0.05);
+            border: none;
+            border-radius: 6px;
+            color: var(--on-surface);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-action-btn:hover {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .dark-mode .quick-action-btn {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .dark-mode .quick-action-btn:hover {
+            background: rgba(255,255,255,0.1);
         }
     </style>
 </head>
@@ -966,7 +1581,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        // Apps configuration
+        // Apps configuration with App Installer
         const apps = [
             {
                 id: 'chrome',
@@ -1015,7 +1630,35 @@
                 icon: 'music_note',
                 taskbar: true,
                 desktop: true
+            },
+            {
+                id: 'app-installer',
+                name: 'App Installer',
+                url: '#app-installer',
+                icon: 'install_desktop',
+                taskbar: true,
+                desktop: true
             }
+        ];
+
+        // Popular Material Icons for app developers
+        const materialIconsList = [
+            'apps', 'extension', 'rocket_launch', 'code', 'web', 'widgets', 
+            'dashboard', 'settings', 'store', 'gamepad', 'movie', 'music_note',
+            'photo', 'video_library', 'book', 'school', 'work', 'business',
+            'map', 'navigation', 'local_dining', 'local_cafe', 'shopping_cart',
+            'flight', 'directions_car', 'hotel', 'local_hospital', 'fitness_center',
+            'palette', 'brush', 'camera_alt', 'mic', 'headphones', 'tv',
+            'phone_android', 'laptop', 'tablet', 'watch', 'devices', 'memory',
+            'storage', 'cloud', 'wifi', 'bluetooth', 'battery_full', 'flash_on',
+            'lightbulb', 'thermostat', 'ac_unit', 'kitchen', 'pool', 'spa',
+            'security', 'lock', 'vpn_key', 'visibility', 'notifications',
+            'chat', 'forum', 'email', 'phone', 'contacts', 'person',
+            'group', 'family_restroom', 'pets', 'nature', 'eco', 'park',
+            'sports', 'sports_soccer', 'sports_basketball', 'sports_tennis',
+            'casino', 'celebration', 'cake', 'restaurant', 'local_bar',
+            'nightlife', 'beach_access', 'downhill_skiing', 'hiking',
+            'directions_bike', 'directions_boat', 'sailing', 'surfing'
         ];
 
         // Chrome OS wallpapers
@@ -1041,10 +1684,866 @@
         };
         let currentUser = null;
 
+        // ===== APP INSTALLER SYSTEM =====
+        const appInstaller = {
+            // Create App Installer window content
+            createWindowContent: function(window) {
+                const content = document.createElement('div');
+                content.className = 'app-installer-content';
+                
+                content.innerHTML = `
+                    <div class="installer-header" style="text-align: center; margin-bottom: 20px;">
+                        <h2 style="color: var(--on-surface); margin-bottom: 8px; font-size: 24px; font-weight: 500;">Endroid App Installer</h2>
+                        <p style="color: #5f6368; font-size: 14px;">Install custom applications on your Endroid OS desktop</p>
+                    </div>
+                    
+                    <div class="installer-main" style="flex: 1; display: flex; flex-direction: column; gap: 30px;">
+                        <!-- Installation Section -->
+                        <div class="installer-section">
+                            <h3>
+                                <span class="material-icons">install_desktop</span>
+                                Install EPK Package
+                            </h3>
+                            
+                            <div class="drop-zone" id="epk-drop-zone">
+                                <div class="drop-icon">
+                                    <span class="material-icons">cloud_upload</span>
+                                </div>
+                                <div class="drop-text">
+                                    <h4>Drag & drop your .epk file here</h4>
+                                    <p>or click to browse files</p>
+                                    <button id="browse-epk-btn" class="btn btn-primary" style="margin-top: 16px; padding: 10px 24px;">
+                                        <span class="material-icons" style="font-size: 18px; margin-right: 8px;">folder_open</span>
+                                        Browse Files
+                                    </button>
+                                </div>
+                                <input type="file" id="epk-file-input" accept=".epk" hidden>
+                            </div>
+                            
+                            <div id="installation-progress" class="progress-container" style="display: none;">
+                                <div class="progress-header">
+                                    <span id="progress-text" style="font-weight: 500;">Reading package...</span>
+                                    <span id="progress-percent" style="font-weight: 500;">0%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div id="progress-fill" class="progress-fill"></div>
+                                </div>
+                            </div>
+                            
+                            <div id="installation-result"></div>
+                        </div>
+                        
+                        <!-- Installed Apps Section -->
+                        <div class="installer-section">
+                            <h3>
+                                <span class="material-icons">apps</span>
+                                Installed Applications
+                            </h3>
+                            
+                            <div id="custom-apps-list" class="custom-apps-grid">
+                                <!-- Custom apps will appear here -->
+                            </div>
+                            
+                            <div id="no-custom-apps" class="empty-state">
+                                <span class="material-icons">inbox</span>
+                                <p>No custom apps installed yet</p>
+                                <p>Install your first app using the section above</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Guide Section -->
+                        <div class="installer-section">
+                            <h3>
+                                <span class="material-icons">help</span>
+                                How to Create .epk Files
+                            </h3>
+                            
+                            <div class="guide-steps">
+                                <div class="guide-step">
+                                    <div class="step-number">1</div>
+                                    <div class="step-content">
+                                        <h4>Create Your App Files</h4>
+                                        <p>Create a folder with all your HTML, CSS, JavaScript files. Your main file should be named <code>index.html</code> or specify it in manifest.json.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="guide-step">
+                                    <div class="step-number">2</div>
+                                    <div class="step-content">
+                                        <h4>Create manifest.json</h4>
+                                        <p>Create a <code>manifest.json</code> file with the following structure:</p>
+                                        <pre>{
+    "name": "Your App Name",
+    "id": "unique-app-id",
+    "version": "1.0.0",
+    "icon": "icon_name_or_file",
+    "main": "index.html",
+    "author": "Your Name",
+    "description": "App description"
+}</pre>
+                                        <p><strong>Note:</strong> The "icon" field can be either:</p>
+                                        <ul style="color: #5f6368; font-size: 14px; margin-left: 20px; margin-top: 8px;">
+                                            <li>A Material Icon name (e.g., "rocket", "code", "music_note")</li>
+                                            <li>An image filename (e.g., "icon.png", "logo.jpg")</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="guide-step">
+                                    <div class="step-number">3</div>
+                                    <div class="step-content">
+                                        <h4>Package Your App</h4>
+                                        <p>Select all files (including manifest.json) and compress them into a .zip file.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="guide-step">
+                                    <div class="step-number">4</div>
+                                    <div class="step-content">
+                                        <h4>Rename to .epk</h4>
+                                        <p>Rename the .zip file extension to .epk (Endroid Package).</p>
+                                        <div class="file-rename">
+                                            <code style="color: #d93025;">my-app.zip</code>
+                                            <span class="material-icons" style="color: #5f6368; font-size: 16px;">arrow_forward</span>
+                                            <code style="color: #34a853;">my-app.epk</code>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="info-box">
+                                <span class="material-icons">info</span>
+                                <div>
+                                    <h4 style="color: #1967d2; margin-bottom: 4px; font-weight: 500;">Quick Example</h4>
+                                    <p style="color: #1967d2; font-size: 14px;">
+                                        Download a sample .epk file to test: 
+                                        <a href="#" id="sample-epk-link" style="color: #1967d2; text-decoration: underline; font-weight: 500;">sample-app.epk</a>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 24px;">
+                                <h4 style="color: var(--on-surface); margin-bottom: 12px; font-weight: 500;">Popular Material Icons</h4>
+                                <p style="color: #5f6368; font-size: 14px; margin-bottom: 12px;">Use these icon names in your manifest.json:</p>
+                                <div class="material-icons-preview">
+                                    ${materialIconsList.slice(0, 30).map(icon => `
+                                        <div class="icon-option" title="${icon}" data-icon="${icon}">
+                                            <span class="material-icons">${icon}</span>
+                                            <span>${icon}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="installer-footer">
+                        <p>Endroid App Installer v1.0 • Only install apps from trusted sources</p>
+                    </div>
+                `;
+                
+                return content;
+            },
+            
+            // Initialize the installer
+            initialize: function(window) {
+                const content = window.querySelector('.window-content');
+                content.innerHTML = '';
+                content.appendChild(this.createWindowContent(window));
+                
+                // Initialize event listeners
+                this.setupEventListeners(window);
+                
+                // Load installed custom apps
+                this.loadInstalledApps();
+            },
+            
+            // Setup event listeners
+            setupEventListeners: function(window) {
+                const dropZone = document.getElementById('epk-drop-zone');
+                const fileInput = document.getElementById('epk-file-input');
+                const browseBtn = document.getElementById('browse-epk-btn');
+                const sampleLink = document.getElementById('sample-epk-link');
+                
+                // Drag and drop events
+                dropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.add('dragover');
+                });
+                
+                dropZone.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('dragover');
+                });
+                
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    dropZone.classList.remove('dragover');
+                    
+                    const file = e.dataTransfer.files[0];
+                    if (file && file.name.endsWith('.epk')) {
+                        this.installEPK(file);
+                    } else {
+                        showNotification('Please select a .epk file', true);
+                    }
+                });
+                
+                // Click to browse
+                dropZone.addEventListener('click', () => {
+                    fileInput.click();
+                });
+                
+                browseBtn.addEventListener('click', () => {
+                    fileInput.click();
+                });
+                
+                // File input change
+                fileInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file && file.name.endsWith('.epk')) {
+                        this.installEPK(file);
+                    } else {
+                        showNotification('Please select a .epk file', true);
+                    }
+                });
+                
+                // Sample EPK link
+                sampleLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.createSampleEPK();
+                });
+            },
+            
+            // Create a sample EPK file for testing
+            createSampleEPK: function() {
+                try {
+                    // Create sample app files
+                    const manifest = {
+                        name: "Sample App",
+                        id: "sample-app-" + Date.now(),
+                        version: "1.0.0",
+                        icon: "rocket_launch",
+                        main: "index.html",
+                        author: "Endroid OS",
+                        description: "A sample app for testing the App Installer"
+                    };
+                    
+                    // Create sample HTML
+                    const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample App</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .logo {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+        }
+        p {
+            margin: 0 0 20px 0;
+            opacity: 0.9;
+            max-width: 500px;
+            line-height: 1.6;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+            max-width: 500px;
+        }
+        .feature {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s;
+        }
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+        .feature .material-icons {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        .status {
+            margin-top: 30px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">
+        <span class="material-icons">rocket_launch</span>
+    </div>
+    <h1>Sample App</h1>
+    <p>This is a sample application installed via EPK. It demonstrates how custom apps work in Endroid OS.</p>
+    
+    <div class="features">
+        <div class="feature">
+            <span class="material-icons">check_circle</span>
+            <div>Feature 1</div>
+        </div>
+        <div class="feature">
+            <span class="material-icons">bolt</span>
+            <div>Feature 2</div>
+        </div>
+        <div class="feature">
+            <span class="material-icons">security</span>
+            <div>Feature 3</div>
+        </div>
+        <div class="feature">
+            <span class="material-icons">auto_awesome</span>
+            <div>Feature 4</div>
+        </div>
+    </div>
+    
+    <div class="status">
+        Installed via Endroid App Installer • v${manifest.version}
+    </div>
+</body>
+</html>`;
+                    
+                    // Create zip file using JSZip
+                    const zip = new JSZip();
+                    zip.file("manifest.json", JSON.stringify(manifest, null, 2));
+                    zip.file("index.html", htmlContent);
+                    
+                    // Generate the zip file
+                    zip.generateAsync({type: "blob"})
+                        .then(blob => {
+                            // Create download link
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = 'sample-app.epk';
+                            document.body.appendChild(a);
+                            a.click();
+                            setTimeout(() => {
+                                document.body.removeChild(a);
+                                URL.revokeObjectURL(url);
+                            }, 100);
+                            
+                            showNotification('Sample EPK downloaded! You can now install it.');
+                        })
+                        .catch(error => {
+                            console.error('Error creating sample EPK:', error);
+                            showNotification('Failed to create sample EPK', true);
+                        });
+                    
+                } catch (error) {
+                    console.error('Error creating sample EPK:', error);
+                    showNotification('Failed to create sample EPK', true);
+                }
+            },
+            
+            // Install EPK file
+            installEPK: async function(file) {
+                const progressDiv = document.getElementById('installation-progress');
+                const progressFill = document.getElementById('progress-fill');
+                const progressText = document.getElementById('progress-text');
+                const progressPercent = document.getElementById('progress-percent');
+                const resultDiv = document.getElementById('installation-result');
+                
+                // Show progress
+                progressDiv.style.display = 'block';
+                progressFill.style.width = '10%';
+                progressPercent.textContent = '10%';
+                progressText.textContent = 'Reading package...';
+                
+                try {
+                    // Read the EPK file
+                    const buffer = await file.arrayBuffer();
+                    
+                    progressFill.style.width = '30%';
+                    progressPercent.textContent = '30%';
+                    progressText.textContent = 'Extracting package...';
+                    
+                    // Extract using JSZip
+                    const zip = await JSZip.loadAsync(buffer);
+                    
+                    progressFill.style.width = '50%';
+                    progressPercent.textContent = '50%';
+                    progressText.textContent = 'Validating manifest...';
+                    
+                    // Check for manifest.json
+                    const manifestFile = zip.file("manifest.json");
+                    if (!manifestFile) {
+                        throw new Error("manifest.json not found in package");
+                    }
+                    
+                    // Parse manifest
+                    const manifestContent = await manifestFile.async("text");
+                    const manifest = JSON.parse(manifestContent);
+                    
+                    // Validate required fields
+                    const requiredFields = ['name', 'id', 'icon', 'main'];
+                    for (const field of requiredFields) {
+                        if (!manifest[field]) {
+                            throw new Error(`Missing required field: ${field}`);
+                        }
+                    }
+                    
+                    // Check if app already exists
+                    const existingApps = JSON.parse(localStorage.getItem('endroid-custom-apps') || '[]');
+                    if (existingApps.some(app => app.id === manifest.id)) {
+                        throw new Error(`App with ID "${manifest.id}" already exists`);
+                    }
+                    
+                    progressFill.style.width = '70%';
+                    progressPercent.textContent = '70%';
+                    progressText.textContent = 'Extracting app files...';
+                    
+                    // Extract all files
+                    const appFiles = {};
+                    const filePromises = [];
+                    
+                    for (const filename in zip.files) {
+                        const zipEntry = zip.files[filename];
+                        if (!zipEntry.dir) {
+                            const content = await zipEntry.async("text");
+                            appFiles[filename] = content;
+                        }
+                    }
+                    
+                    await Promise.all(filePromises);
+                    
+                    progressFill.style.width = '90%';
+                    progressPercent.textContent = '90%';
+                    progressText.textContent = 'Installing app...';
+                    
+                    // Save app to localStorage
+                    const appData = {
+                        id: manifest.id,
+                        name: manifest.name,
+                        icon: manifest.icon,
+                        files: appFiles,
+                        manifest: manifest,
+                        installedDate: new Date().toISOString(),
+                        epkName: file.name
+                    };
+                    
+                    existingApps.push(appData);
+                    localStorage.setItem('endroid-custom-apps', JSON.stringify(existingApps));
+                    
+                    // Update installed apps list
+                    this.loadInstalledApps();
+                    
+                    progressFill.style.width = '100%';
+                    progressPercent.textContent = '100%';
+                    progressText.textContent = 'Installation complete!';
+                    
+                    // Show success message
+                    setTimeout(() => {
+                        resultDiv.innerHTML = `
+                            <div class="result-message result-success">
+                                <span class="material-icons">check_circle</span>
+                                <div>
+                                    <h4 style="color: #137333; margin: 0 0 4px 0; font-weight: 500;">App installed successfully!</h4>
+                                    <p style="color: #137333; margin: 0; font-size: 14px;">
+                                        "${manifest.name}" has been installed and is now available in your app launcher.
+                                    </p>
+                                </div>
+                            </div>
+                        `;
+                        resultDiv.style.display = 'block';
+                        
+                        // Refresh desktop icons
+                        createDesktopIcons();
+                        
+                        showNotification(`"${manifest.name}" installed successfully!`);
+                    }, 500);
+                    
+                } catch (error) {
+                    console.error('Installation failed:', error);
+                    
+                    resultDiv.innerHTML = `
+                        <div class="result-message result-error">
+                            <span class="material-icons">error</span>
+                            <div>
+                                <h4 style="color: #c5221f; margin: 0 0 4px 0; font-weight: 500;">Installation failed</h4>
+                                <p style="color: #c5221f; margin: 0; font-size: 14px;">
+                                    ${error.message}
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                    resultDiv.style.display = 'block';
+                    
+                    showNotification(`Installation failed: ${error.message}`, true);
+                }
+                
+                // Hide progress after 3 seconds
+                setTimeout(() => {
+                    progressDiv.style.display = 'none';
+                    progressFill.style.width = '0%';
+                }, 3000);
+            },
+            
+            // Load and display installed custom apps
+            loadInstalledApps: function() {
+                const appsList = document.getElementById('custom-apps-list');
+                const noAppsMsg = document.getElementById('no-custom-apps');
+                
+                const customApps = JSON.parse(localStorage.getItem('endroid-custom-apps') || '[]');
+                
+                if (customApps.length === 0) {
+                    appsList.innerHTML = '';
+                    noAppsMsg.style.display = 'block';
+                    return;
+                }
+                
+                noAppsMsg.style.display = 'none';
+                appsList.innerHTML = '';
+                
+                customApps.forEach((app, index) => {
+                    const appElement = document.createElement('div');
+                    appElement.className = 'custom-app-card';
+                    appElement.title = `Click to open ${app.name}`;
+                    
+                    // Get icon HTML
+                    let iconHTML = '';
+                    if (this.isMaterialIcon(app.icon)) {
+                        // Use Material Icon
+                        iconHTML = `<span class="material-icons">${app.icon}</span>`;
+                    } else {
+                        // Try to get image from app files
+                        const iconFile = app.files[app.icon];
+                        if (iconFile) {
+                            // It's text content, try to parse as base64 or use as-is
+                            if (iconFile.startsWith('data:')) {
+                                iconHTML = `<img src="${iconFile}" alt="${app.name}">`;
+                            } else {
+                                // Try to detect if it's an image file
+                                if (app.icon.toLowerCase().endsWith('.png') || 
+                                    app.icon.toLowerCase().endsWith('.jpg') || 
+                                    app.icon.toLowerCase().endsWith('.jpeg') ||
+                                    app.icon.toLowerCase().endsWith('.gif') ||
+                                    app.icon.toLowerCase().endsWith('.svg')) {
+                                    iconHTML = `<span class="material-icons">image</span>`;
+                                } else {
+                                    iconHTML = '<span class="material-icons">apps</span>';
+                                }
+                            }
+                        } else {
+                            // Fallback to default Material Icon
+                            iconHTML = '<span class="material-icons">apps</span>';
+                        }
+                    }
+                    
+                    appElement.innerHTML = `
+                        <div class="custom-app-icon">
+                            ${iconHTML}
+                        </div>
+                        <div class="custom-app-name">${app.name}</div>
+                        <div class="custom-app-version">v${app.manifest.version || '1.0.0'}</div>
+                        <button class="uninstall-btn" data-index="${index}" title="Uninstall ${app.name}">
+                            ×
+                        </button>
+                    `;
+                    
+                    // Click to launch app
+                    appElement.addEventListener('click', (e) => {
+                        if (!e.target.closest('.uninstall-btn')) {
+                            this.launchCustomApp(app);
+                        }
+                    });
+                    
+                    // Uninstall button
+                    const uninstallBtn = appElement.querySelector('.uninstall-btn');
+                    uninstallBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.uninstallApp(index);
+                    });
+                    
+                    appsList.appendChild(appElement);
+                });
+            },
+            
+            // Check if a string is a Material Icon name
+            isMaterialIcon: function(iconName) {
+                if (!iconName) return false;
+                // Check if it's a common Material Icon name (no file extension)
+                if (!iconName.includes('.') && !iconName.includes('/') && !iconName.startsWith('data:')) {
+                    // Check against our list of known Material Icons
+                    return materialIconsList.includes(iconName) || iconName.includes('_');
+                }
+                return false;
+            },
+            
+            // Launch custom app - FIXED VERSION
+            launchCustomApp: function(app) {
+                console.log('Launching custom app:', app);
+                
+                // Check if window already exists
+                let window = windows.get(app.id);
+                
+                if (window) {
+                    console.log('Window already exists, bringing to front');
+                    bringToFront(window);
+                    if (window.classList.contains('minimized')) {
+                        window.classList.remove('minimized');
+                    }
+                    setActiveWindow(window);
+                    return window;
+                }
+                
+                // Create app config for our system
+                const appConfig = {
+                    id: app.id,
+                    name: app.name,
+                    url: `#custom-app:${app.id}`,
+                    icon: app.icon,
+                    taskbar: true,
+                    desktop: true,
+                    custom: true,
+                    data: app
+                };
+                
+                // Create new window for custom app
+                window = this.createCustomAppWindow(appConfig);
+                windows.set(app.id, window);
+                document.getElementById('desktop').appendChild(window);
+                
+                // Create taskbar item
+                createTaskbarItem(appConfig, window);
+                
+                setActiveWindow(window);
+                bringToFront(window);
+                
+                return window;
+            },
+            
+            // Create window for custom app - FIXED VERSION
+            createCustomAppWindow: function(app) {
+                const windowId = `window_${app.id}_${Date.now()}`;
+                const window = document.createElement('div');
+                window.className = 'window';
+                window.id = windowId;
+                window.dataset.appId = app.id;
+                window.dataset.customApp = 'true';
+                
+                // Position window
+                const offset = windows.size * 30;
+                const desktop = document.getElementById('desktop');
+                const desktopRect = desktop.getBoundingClientRect();
+                
+                let left = 50 + offset;
+                let top = 50 + offset;
+                
+                // Ensure window stays within desktop bounds
+                left = Math.min(left, desktopRect.width - 400);
+                top = Math.min(top, desktopRect.height - 300);
+                
+                window.style.left = `${Math.max(0, left)}px`;
+                window.style.top = `${Math.max(0, top)}px`;
+                window.style.width = '800px';
+                window.style.height = '600px';
+                window.style.zIndex = windowZIndex++;
+                
+                // Get window icon HTML
+                let windowIconHTML = '';
+                if (this.isMaterialIcon(app.icon)) {
+                    windowIconHTML = `<span class="material-icons">${app.icon}</span>`;
+                } else {
+                    const iconFile = app.data.files[app.icon];
+                    if (iconFile) {
+                        if (iconFile.startsWith('data:')) {
+                            windowIconHTML = `<img src="${iconFile}" alt="${app.name}">`;
+                        } else {
+                            windowIconHTML = '<span class="material-icons">apps</span>';
+                        }
+                    } else {
+                        windowIconHTML = '<span class="material-icons">apps</span>';
+                    }
+                }
+                
+                window.innerHTML = `
+                    <div class="title-bar">
+                        <div class="window-icon">
+                            ${windowIconHTML}
+                        </div>
+                        <span class="title-text">${app.name}</span>
+                        <div class="window-controls">
+                            <button class="win-btn minimize" title="Minimize">
+                                <span class="material-icons">minimize</span>
+                            </button>
+                            <button class="win-btn maximize" title="Maximize">
+                                <span class="material-icons">crop_square</span>
+                            </button>
+                            <button class="win-btn close" title="Close">
+                                <span class="material-icons">close</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="window-content" id="custom-app-content-${app.id}">
+                        <!-- App content will be loaded here -->
+                    </div>
+                    <div class="window-resize-handle"></div>
+                `;
+                
+                // Load app content
+                this.loadAppContent(app, window.querySelector('.window-content'));
+                
+                // Make window draggable and resizable
+                const titleBar = window.querySelector('.title-bar');
+                const minimizeBtn = window.querySelector('.minimize');
+                const maximizeBtn = window.querySelector('.maximize');
+                const closeBtn = window.querySelector('.close');
+                const resizeHandle = window.querySelector('.window-resize-handle');
+                
+                makeDraggable(window, titleBar);
+                makeResizable(window, resizeHandle);
+                
+                // Window controls
+                minimizeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    minimizeWindow(window);
+                });
+                
+                maximizeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleMaximize(window);
+                });
+                
+                closeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    closeWindow(window);
+                });
+                
+                window.addEventListener('mousedown', () => {
+                    bringToFront(window);
+                });
+                
+                return window;
+            },
+            
+            // Load custom app content - FIXED VERSION
+            loadAppContent: function(app, container) {
+                const appData = app.data;
+                
+                // Get main HTML file from manifest
+                const mainFile = appData.manifest.main || 'index.html';
+                const htmlContent = appData.files[mainFile];
+                
+                if (htmlContent) {
+                    try {
+                        // Create a sandboxed iframe for the app
+                        const iframe = document.createElement('iframe');
+                        iframe.className = 'custom-app-container';
+                        iframe.sandbox = "allow-same-origin allow-scripts allow-popups allow-forms allow-modals";
+                        iframe.allowfullscreen = true;
+                        
+                        // Write HTML content to iframe using srcdoc
+                        iframe.srcdoc = htmlContent;
+                        
+                        container.appendChild(iframe);
+                    } catch (error) {
+                        console.error('Error loading app content:', error);
+                        container.innerHTML = `
+                            <div class="app-error">
+                                <span class="material-icons">error</span>
+                                <h3>App Load Error</h3>
+                                <p>Failed to load app content: ${error.message}</p>
+                                <div class="quick-actions">
+                                    <button class="quick-action-btn" onclick="appInstaller.reloadApp('${app.id}')">
+                                        <span class="material-icons" style="font-size: 16px; margin-right: 4px;">refresh</span>
+                                        Reload
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else {
+                    container.innerHTML = `
+                        <div class="app-error">
+                            <span class="material-icons">error</span>
+                            <h3>App Content Missing</h3>
+                            <p>Main file "${mainFile}" not found in package.</p>
+                        </div>
+                    `;
+                }
+            },
+            
+            // Reload app
+            reloadApp: function(appId) {
+                const window = windows.get(appId);
+                if (window) {
+                    const app = JSON.parse(localStorage.getItem('endroid-custom-apps') || '[]')
+                        .find(a => a.id === appId);
+                    if (app) {
+                        const container = window.querySelector('.window-content');
+                        container.innerHTML = '';
+                        const appConfig = {
+                            id: app.id,
+                            name: app.name,
+                            icon: app.icon,
+                            custom: true,
+                            data: app
+                        };
+                        this.loadAppContent(appConfig, container);
+                    }
+                }
+            },
+            
+            // Uninstall app
+            uninstallApp: function(index) {
+                const customApps = JSON.parse(localStorage.getItem('endroid-custom-apps') || '[]');
+                const app = customApps[index];
+                
+                if (confirm(`Are you sure you want to uninstall "${app.name}"?\n\nThis will remove the app from your system.`)) {
+                    // Remove from array
+                    customApps.splice(index, 1);
+                    localStorage.setItem('endroid-custom-apps', JSON.stringify(customApps));
+                    
+                    // Close app window if open
+                    const window = windows.get(app.id);
+                    if (window) {
+                        closeWindow(window);
+                    }
+                    
+                    // Update UI
+                    this.loadInstalledApps();
+                    createDesktopIcons();
+                    
+                    showNotification(`"${app.name}" uninstalled successfully`);
+                }
+            }
+        };
+
+        // ===== CORE SYSTEM FUNCTIONS =====
+
         // Load settings from localStorage
         function loadSettings() {
             try {
-                const saved = localStorage.getItem('chromeOS-settings');
+                const saved = localStorage.getItem('endroid-settings');
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     Object.assign(settings, parsed);
@@ -1058,7 +2557,7 @@
         // Save settings to localStorage
         function saveSettings() {
             try {
-                localStorage.setItem('chromeOS-settings', JSON.stringify(settings));
+                localStorage.setItem('endroid-settings', JSON.stringify(settings));
             } catch (e) {
                 console.error('Error saving settings:', e);
             }
@@ -1255,7 +2754,7 @@
                         </div>
                     </div>
                     <div class="account-footer">
-                        Endroid OS Desktop v1.0 Beta
+                        Endroid OS Desktop v1.0
                     </div>
                 `;
             } else {
@@ -1356,7 +2855,7 @@
                 // Save user info to localStorage if signed in
                 if (user) {
                     try {
-                        localStorage.setItem('chromeOS-user', JSON.stringify({
+                        localStorage.setItem('endroid-user', JSON.stringify({
                             uid: user.uid,
                             displayName: user.displayName,
                             email: user.email,
@@ -1366,7 +2865,7 @@
                         console.error('Error saving user data:', e);
                     }
                 } else {
-                    localStorage.removeItem('chromeOS-user');
+                    localStorage.removeItem('endroid-user');
                 }
             });
 
@@ -1374,7 +2873,7 @@
             loadSettings();
             
             // Load saved user info
-            const savedUser = localStorage.getItem('chromeOS-user');
+            const savedUser = localStorage.getItem('endroid-user');
             if (savedUser) {
                 try {
                     const userData = JSON.parse(savedUser);
@@ -1438,6 +2937,12 @@
                         if (overlay) overlay.remove();
                     }
                 }
+                if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                    e.preventDefault();
+                    // Open App Installer
+                    const app = apps.find(a => a.id === 'app-installer');
+                    if (app) openApp(app);
+                }
             });
             
             // Handle window resize
@@ -1459,32 +2964,114 @@
             const container = document.getElementById('desktop-icons');
             container.innerHTML = '';
             
+            // Add regular apps
             apps.forEach((app) => {
                 if (!app.desktop) return;
                 
-                const icon = document.createElement('div');
-                icon.className = 'desktop-icon';
-                icon.dataset.appId = app.id;
-                icon.title = app.name;
+                const icon = createDesktopIcon(app);
+                container.appendChild(icon);
+                desktopIcons.set(app.id, icon);
+            });
+            
+            // Add custom apps from localStorage
+            const customApps = JSON.parse(localStorage.getItem('endroid-custom-apps') || '[]');
+            customApps.forEach((app) => {
+                const appConfig = {
+                    id: app.id,
+                    name: app.name,
+                    url: `#custom-app:${app.id}`,
+                    icon: app.icon,
+                    desktop: true,
+                    custom: true,
+                    data: app
+                };
                 
-                icon.innerHTML = `
-                    <span class="material-icons">${app.icon}</span>
-                    <span>${app.name}</span>
-                `;
-                
-                // Single click to open app
-                icon.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    openApp(app);
-                });
-                
+                const icon = createDesktopIcon(appConfig);
                 container.appendChild(icon);
                 desktopIcons.set(app.id, icon);
             });
         }
 
-        // Open app window
+        // Helper function to create desktop icons with proper icon handling
+        function createDesktopIcon(app) {
+            const icon = document.createElement('div');
+            icon.className = 'desktop-icon';
+            icon.dataset.appId = app.id;
+            icon.title = app.name;
+            
+            // Get icon HTML
+            let iconHTML = '';
+            if (app.custom) {
+                // Custom app icon handling
+                if (appInstaller.isMaterialIcon(app.icon)) {
+                    iconHTML = `<span class="material-icons">${app.icon}</span>`;
+                } else {
+                    // Try to get image from app files
+                    const iconFile = app.data.files[app.icon];
+                    if (iconFile) {
+                        if (iconFile.startsWith('data:')) {
+                            iconHTML = `<img class="icon-image" src="${iconFile}" alt="${app.name}">`;
+                        } else {
+                            iconHTML = `<span class="material-icons">apps</span>`;
+                        }
+                    } else {
+                        iconHTML = `<span class="material-icons">apps</span>`;
+                    }
+                }
+            } else {
+                // Built-in app (always Material Icon)
+                iconHTML = `<span class="material-icons">${app.icon}</span>`;
+            }
+            
+            icon.innerHTML = `
+                ${iconHTML}
+                <span>${app.name}</span>
+            `;
+            
+            icon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openApp(app);
+            });
+            
+            return icon;
+        }
+
+        // Open app window - FIXED VERSION
         function openApp(app) {
+            console.log('Opening app:', app);
+            
+            // Special handling for App Installer
+            if (app.id === 'app-installer') {
+                let window = windows.get(app.id);
+                
+                if (window) {
+                    bringToFront(window);
+                    if (window.classList.contains('minimized')) {
+                        window.classList.remove('minimized');
+                    }
+                } else {
+                    window = createWindow(app);
+                    windows.set(app.id, window);
+                    document.getElementById('desktop').appendChild(window);
+                    
+                    // Initialize App Installer
+                    setTimeout(() => {
+                        appInstaller.initialize(window);
+                    }, 100);
+                    
+                    createTaskbarItem(app, window);
+                }
+                
+                setActiveWindow(window);
+                return window;
+            }
+            
+            // Handle custom apps
+            if (app.custom) {
+                return appInstaller.launchCustomApp(app.data || app);
+            }
+            
+            // Original code for regular apps...
             let window = windows.get(app.id);
             
             if (window) {
@@ -1535,9 +3122,32 @@
             window.style.height = '600px';
             window.style.zIndex = windowZIndex++;
             
+            // Get window icon HTML (handle custom apps differently)
+            let windowIconHTML = '';
+            if (app.custom) {
+                if (appInstaller.isMaterialIcon(app.icon)) {
+                    windowIconHTML = `<span class="material-icons">${app.icon}</span>`;
+                } else {
+                    const iconFile = app.data?.files?.[app.icon];
+                    if (iconFile) {
+                        if (iconFile.startsWith('data:')) {
+                            windowIconHTML = `<img src="${iconFile}" alt="${app.name}">`;
+                        } else {
+                            windowIconHTML = '<span class="material-icons">apps</span>';
+                        }
+                    } else {
+                        windowIconHTML = '<span class="material-icons">apps</span>';
+                    }
+                }
+            } else {
+                windowIconHTML = `<span class="material-icons">${app.icon}</span>`;
+            }
+            
             window.innerHTML = `
                 <div class="title-bar">
-                    <span class="material-icons window-icon">${app.icon}</span>
+                    <div class="window-icon">
+                        ${windowIconHTML}
+                    </div>
                     <span class="title-text">${app.name}</span>
                     <div class="window-controls">
                         <button class="win-btn minimize" title="Minimize">
@@ -1552,9 +3162,9 @@
                     </div>
                 </div>
                 <div class="window-content">
-                    <iframe src="${app.url}" title="${app.name}" 
+                    ${app.id === 'app-installer' ? '' : `<iframe src="${app.url}" title="${app.name}" 
                             sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"
-                            allowfullscreen></iframe>
+                            allowfullscreen></iframe>`}
                 </div>
                 <div class="window-resize-handle"></div>
             `;
@@ -1595,13 +3205,6 @@
                 }
             });
             
-            // Touch support
-            window.addEventListener('touchstart', (e) => {
-                if (!e.target.closest('.win-btn')) {
-                    bringToFront(window);
-                }
-            });
-            
             return window;
         }
 
@@ -1617,15 +3220,13 @@
                 bringToFront(window);
                 
                 const rect = window.getBoundingClientRect();
-                startX = e.clientX || e.touches[0].clientX;
-                startY = e.clientY || e.touches[0].clientY;
+                startX = e.clientX;
+                startY = e.clientY;
                 startLeft = rect.left;
                 startTop = rect.top;
                 
                 document.addEventListener('mousemove', drag);
                 document.addEventListener('mouseup', stopDrag);
-                document.addEventListener('touchmove', drag, { passive: false });
-                document.addEventListener('touchend', stopDrag);
             };
             
             const drag = (e) => {
@@ -1633,11 +3234,8 @@
                 
                 e.preventDefault();
                 
-                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-                
-                let newX = startLeft + (clientX - startX);
-                let newY = startTop + (clientY - startY);
+                let newX = startLeft + (e.clientX - startX);
+                let newY = startTop + (e.clientY - startY);
                 
                 // Boundary checking
                 const desktop = document.getElementById('desktop');
@@ -1655,12 +3253,9 @@
                 isDragging = false;
                 document.removeEventListener('mousemove', drag);
                 document.removeEventListener('mouseup', stopDrag);
-                document.removeEventListener('touchmove', drag);
-                document.removeEventListener('touchend', stopDrag);
             };
             
             handle.addEventListener('mousedown', startDrag);
-            handle.addEventListener('touchstart', startDrag, { passive: true });
         }
 
         // Make window resizable
@@ -1674,15 +3269,13 @@
                 bringToFront(window);
                 
                 const rect = window.getBoundingClientRect();
-                startX = e.clientX || e.touches[0].clientX;
-                startY = e.clientY || e.touches[0].clientY;
+                startX = e.clientX;
+                startY = e.clientY;
                 startWidth = rect.width;
                 startHeight = rect.height;
                 
                 document.addEventListener('mousemove', resize);
                 document.addEventListener('mouseup', stopResize);
-                document.addEventListener('touchmove', resize, { passive: false });
-                document.addEventListener('touchend', stopResize);
             };
             
             const resize = (e) => {
@@ -1690,11 +3283,8 @@
                 
                 e.preventDefault();
                 
-                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-                
-                const newWidth = Math.max(400, startWidth + (clientX - startX));
-                const newHeight = Math.max(300, startHeight + (clientY - startY));
+                const newWidth = Math.max(400, startWidth + (e.clientX - startX));
+                const newHeight = Math.max(300, startHeight + (e.clientY - startY));
                 
                 // Max boundaries
                 const desktop = document.getElementById('desktop');
@@ -1709,12 +3299,9 @@
                 isResizing = false;
                 document.removeEventListener('mousemove', resize);
                 document.removeEventListener('mouseup', stopResize);
-                document.removeEventListener('touchmove', resize);
-                document.removeEventListener('touchend', stopResize);
             };
             
             handle.addEventListener('mousedown', startResize);
-            handle.addEventListener('touchstart', startResize, { passive: true });
             
             // Also allow resizing from bottom-right corner
             window.addEventListener('mousedown', (e) => {
@@ -1725,7 +3312,7 @@
             });
         }
 
-        // Create taskbar item
+        // Create taskbar item with icon handling
         function createTaskbarItem(app, window) {
             const taskbar = document.getElementById('taskbar');
             const item = document.createElement('div');
@@ -1733,7 +3320,21 @@
             item.dataset.appId = app.id;
             item.title = app.name;
             
-            item.innerHTML = `<span class="material-icons">${app.icon}</span>`;
+            // Get icon HTML
+            if (app.custom) {
+                if (appInstaller.isMaterialIcon(app.icon)) {
+                    item.innerHTML = `<span class="material-icons">${app.icon}</span>`;
+                } else {
+                    const iconFile = app.data?.files?.[app.icon];
+                    if (iconFile && iconFile.startsWith('data:')) {
+                        item.innerHTML = `<img src="${iconFile}" alt="${app.name}">`;
+                    } else {
+                        item.innerHTML = '<span class="material-icons">apps</span>';
+                    }
+                }
+            } else {
+                item.innerHTML = `<span class="material-icons">${app.icon}</span>`;
+            }
             
             item.addEventListener('click', () => {
                 if (window.classList.contains('minimized')) {
@@ -1812,21 +3413,53 @@
             const launcher = document.createElement('div');
             launcher.className = 'app-launcher-modal';
             
+            // Get all apps (built-in + custom)
+            const allApps = [...apps];
+            const customApps = JSON.parse(localStorage.getItem('endroid-custom-apps') || '[]');
+            customApps.forEach(app => {
+                allApps.push({
+                    id: app.id,
+                    name: app.name,
+                    url: `#custom-app:${app.id}`,
+                    icon: app.icon,
+                    custom: true,
+                    data: app
+                });
+            });
+            
             launcher.innerHTML = `
-                <div style="width: 600px; max-width: 90%; max-height: 90vh; overflow-y: auto;">
+                <div style="width: 600px; max-width: 90%; max-height: 90vh; overflow-y: auto; padding: 20px;">
                     <div style="margin-bottom: 40px; text-align: center;">
-                        <h2 style="color: var(--on-surface); margin-bottom: 20px;">Applications</h2>
+                        <h2 style="color: var(--on-surface); margin-bottom: 20px; font-size: 28px; font-weight: 500;">Applications</h2>
                         <div style="display: grid; grid-template-columns: repeat(auto-fill, 100px); gap: 20px; justify-content: center;">
-                            ${apps.map(app => `
-                                <div class="desktop-icon" style="color: var(--on-surface); cursor: pointer; padding: 15px;" data-app-id="${app.id}" title="${app.name}">
-                                    <span class="material-icons" style="font-size: 36px;">${app.icon}</span>
-                                    <span style="margin-top: 5px; font-size: 12px;">${app.name}</span>
-                                </div>
-                            `).join('')}
+                            ${allApps.map(app => {
+                                let iconHTML = '';
+                                if (app.custom) {
+                                    if (appInstaller.isMaterialIcon(app.icon)) {
+                                        iconHTML = `<span class="material-icons">${app.icon}</span>`;
+                                    } else {
+                                        const iconFile = app.data?.files?.[app.icon];
+                                        if (iconFile && iconFile.startsWith('data:')) {
+                                            iconHTML = `<img src="${iconFile}" alt="${app.name}" style="width: 48px; height: 48px; object-fit: contain; border-radius: 10px;">`;
+                                        } else {
+                                            iconHTML = '<span class="material-icons">apps</span>';
+                                        }
+                                    }
+                                } else {
+                                    iconHTML = `<span class="material-icons">${app.icon}</span>`;
+                                }
+                                
+                                return `
+                                    <div class="desktop-icon" style="color: var(--on-surface); cursor: pointer; padding: 15px;" data-app-id="${app.id}" title="${app.name}">
+                                        ${iconHTML}
+                                        <span style="margin-top: 5px; font-size: 12px; font-weight: 500;">${app.name}</span>
+                                    </div>
+                                `;
+                            }).join('')}
                         </div>
                     </div>
                     <div style="text-align: center; padding: 20px 0;">
-                        <button id="close-launcher" style="padding: 10px 30px; background: var(--primary); color: white; border: none; border-radius: 24px; cursor: pointer; font-size: 14px;">
+                        <button id="close-launcher" class="btn btn-primary" style="padding: 10px 30px; border-radius: 24px; font-weight: 500;">
                             Close
                         </button>
                     </div>
@@ -1841,7 +3474,7 @@
                 icon.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const appId = e.currentTarget.dataset.appId;
-                    const app = apps.find(a => a.id === appId);
+                    const app = allApps.find(a => a.id === appId);
                     if (app) {
                         openApp(app);
                         launcher.remove();
