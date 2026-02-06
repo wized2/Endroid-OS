@@ -29,6 +29,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
@@ -37,6 +38,8 @@
             overflow: hidden;
             position: relative;
             transition: background 0.3s ease;
+            touch-action: none;
+            user-select: none;
         }
         
         /* Background */
@@ -64,6 +67,7 @@
             overflow: auto;
             padding: 20px;
             z-index: 2;
+            touch-action: pan-x pan-y;
         }
         
         /* Desktop Icons Grid */
@@ -143,6 +147,7 @@
             max-height: calc(100vh - 96px);
             color: var(--on-surface);
             z-index: 100;
+            touch-action: none;
         }
         
         .dark-mode .window {
@@ -162,6 +167,10 @@
             display: none;
         }
         
+        .window.active {
+            z-index: 200;
+        }
+        
         .title-bar {
             height: 40px;
             background: #f8f9fa;
@@ -173,6 +182,7 @@
             user-select: none;
             position: relative;
             z-index: 101;
+            touch-action: none;
         }
         
         .dark-mode .title-bar {
@@ -196,6 +206,9 @@
             font-size: 14px;
             font-weight: 500;
             color: #3c4043;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .dark-mode .title-text {
@@ -221,6 +234,7 @@
             color: #5f6368;
             position: relative;
             z-index: 102;
+            touch-action: manipulation;
         }
         
         .dark-mode .win-btn {
@@ -301,6 +315,7 @@
             margin-right: 20px;
             position: relative;
             z-index: 1001;
+            touch-action: manipulation;
         }
         
         #app-launcher:hover {
@@ -317,6 +332,12 @@
             padding: 0 10px;
             position: relative;
             z-index: 1001;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        #taskbar::-webkit-scrollbar {
+            display: none;
         }
         
         .taskbar-item {
@@ -330,6 +351,8 @@
             transition: all 0.2s;
             position: relative;
             z-index: 1001;
+            flex-shrink: 0;
+            touch-action: manipulation;
         }
         
         .taskbar-item:hover {
@@ -392,6 +415,7 @@
             cursor: pointer;
             transition: background 0.2s;
             position: relative;
+            touch-action: manipulation;
         }
         
         .system-icon:hover {
@@ -436,6 +460,7 @@
             font-weight: 500;
             color: #3c4043;
             margin-left: 16px;
+            white-space: nowrap;
         }
         
         .dark-mode #clock {
@@ -450,12 +475,14 @@
             transform: translate(-50%, -50%);
             width: 500px;
             max-width: 90%;
+            max-height: 90vh;
             background: var(--surface);
             border-radius: 12px;
             box-shadow: var(--elevation-3);
             z-index: 2000;
             color: var(--on-surface);
             border: 1px solid #dadce0;
+            overflow: hidden;
         }
         
         .dark-mode .settings-modal {
@@ -468,6 +495,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
         
         .dark-mode .modal-header {
@@ -481,6 +509,8 @@
         
         .modal-content {
             padding: 20px;
+            overflow-y: auto;
+            max-height: calc(90vh - 140px);
         }
         
         .setting-item {
@@ -509,6 +539,7 @@
             background: var(--surface);
             color: var(--on-surface);
             font-family: 'Roboto', sans-serif;
+            font-size: 14px;
         }
         
         .dark-mode select,
@@ -522,6 +553,7 @@
             display: flex;
             align-items: center;
             cursor: pointer;
+            user-select: none;
         }
         
         .checkbox {
@@ -535,6 +567,7 @@
             justify-content: center;
             transition: all 0.2s;
             cursor: pointer;
+            flex-shrink: 0;
         }
         
         .checkbox.checked {
@@ -554,6 +587,7 @@
             display: flex;
             justify-content: flex-end;
             gap: 10px;
+            flex-shrink: 0;
         }
         
         .dark-mode .modal-footer {
@@ -568,6 +602,8 @@
             font-family: 'Roboto', sans-serif;
             font-weight: 500;
             transition: background 0.2s;
+            font-size: 14px;
+            touch-action: manipulation;
         }
         
         .btn-primary {
@@ -631,6 +667,7 @@
             z-index: 2000;
             color: var(--on-surface);
             border: 1px solid #dadce0;
+            overflow: hidden;
         }
         
         .dark-mode .account-modal {
@@ -641,6 +678,7 @@
             padding: 20px;
             border-bottom: 1px solid #dadce0;
             text-align: center;
+            position: relative;
         }
         
         .dark-mode .account-header {
@@ -692,6 +730,7 @@
             color: white;
             font-weight: 500;
             font-size: 24px;
+            flex-shrink: 0;
         }
         
         .user-avatar-large img {
@@ -702,17 +741,24 @@
         
         .user-details {
             flex: 1;
+            min-width: 0;
         }
         
         .user-name {
             font-size: 16px;
             font-weight: 500;
             margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .user-email {
             font-size: 14px;
             color: #5f6368;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .dark-mode .user-email {
@@ -740,6 +786,7 @@
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
+            touch-action: manipulation;
         }
         
         .dark-mode .login-btn {
@@ -847,6 +894,33 @@
         .dark-mode ::-webkit-scrollbar-thumb:hover {
             background: rgba(255,255,255,0.3);
         }
+        
+        /* Desktop click handling */
+        #desktop:active {
+            cursor: default;
+        }
+        
+        /* Modal overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1999;
+        }
+        
+        /* Drag/resize handle */
+        .window-resize-handle {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 15px;
+            height: 15px;
+            cursor: nwse-resize;
+            z-index: 101;
+        }
     </style>
 </head>
 <body class="light-mode">
@@ -892,7 +966,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        // Apps configuration with alternative services
+        // Apps configuration
         const apps = [
             {
                 id: 'chrome',
@@ -903,33 +977,9 @@
                 desktop: true
             },
             {
-                id: 'youtube',
-                name: 'YouTube',
-                url: 'https://www.youtube.com',
-                icon: 'play_circle',
-                taskbar: true,
-                desktop: true
-            },
-            {
-                id: 'mail',
-                name: 'Email',
-                url: 'https://mail.google.com',
-                icon: 'mail',
-                taskbar: true,
-                desktop: true
-            },
-            {
-                id: 'drive',
-                name: 'Drive',
-                url: 'https://drive.google.com',
-                icon: 'cloud',
-                taskbar: true,
-                desktop: true
-            },
-            {
                 id: 'calculator',
                 name: 'Calculator',
-                url: 'https://www.online-calculator.com/html5/online-calculator/index.php?v=10',
+                url: 'https://wized2.github.io/Calculator',
                 icon: 'calculate',
                 taskbar: true,
                 desktop: true
@@ -937,7 +987,7 @@
             {
                 id: 'clock',
                 name: 'Clock',
-                url: 'https://clock.timer.net/',
+                url: 'https://wized2.github.io/Clock/',
                 icon: 'schedule',
                 taskbar: true,
                 desktop: true
@@ -945,47 +995,23 @@
             {
                 id: 'notes',
                 name: 'Notes',
-                url: 'https://notes.io/',
+                url: 'https://wized2.github.io/Notes/',
                 icon: 'note',
-                taskbar: true,
-                desktop: true
-            },
-            {
-                id: 'maps',
-                name: 'Maps',
-                url: 'https://www.google.com/maps',
-                icon: 'map',
-                taskbar: true,
-                desktop: true
-            },
-            {
-                id: 'docs',
-                name: 'Docs',
-                url: 'https://docs.google.com',
-                icon: 'description',
                 taskbar: true,
                 desktop: true
             },
             {
                 id: 'calendar',
                 name: 'Calendar',
-                url: 'https://calendar.google.com',
+                url: 'https://calendar.google.com/calendar/embed?src=f5a7ee6f7cffe3a8e9bc82fb25507fa5ffa332d2b03d0412c4f7c32e6f07a129%40group.calendar.google.com&ctz=Asia%2FKarachi',
                 icon: 'calendar_today',
-                taskbar: true,
-                desktop: true
-            },
-            {
-                id: 'photos',
-                name: 'Photos',
-                url: 'https://photos.google.com',
-                icon: 'photo',
                 taskbar: true,
                 desktop: true
             },
             {
                 id: 'music',
                 name: 'Music',
-                url: 'https://music.youtube.com',
+                url: 'https://wized2.github.io/Music/',
                 icon: 'music_note',
                 taskbar: true,
                 desktop: true
@@ -1017,17 +1043,25 @@
 
         // Load settings from localStorage
         function loadSettings() {
-            const saved = localStorage.getItem('chromeOS-settings');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                Object.assign(settings, parsed);
+            try {
+                const saved = localStorage.getItem('chromeOS-settings');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    Object.assign(settings, parsed);
+                }
+                applySettings();
+            } catch (e) {
+                console.error('Error loading settings:', e);
             }
-            applySettings();
         }
 
         // Save settings to localStorage
         function saveSettings() {
-            localStorage.setItem('chromeOS-settings', JSON.stringify(settings));
+            try {
+                localStorage.setItem('chromeOS-settings', JSON.stringify(settings));
+            } catch (e) {
+                console.error('Error saving settings:', e);
+            }
         }
 
         // Apply settings
@@ -1044,7 +1078,18 @@
             // Apply background
             const background = document.getElementById('background');
             const bgUrl = settings.customBackgroundUrl || settings.backgroundUrl;
-            background.style.backgroundImage = `url('${bgUrl}')`;
+            if (bgUrl) {
+                // Preload image to avoid flickering
+                const img = new Image();
+                img.onload = () => {
+                    background.style.backgroundImage = `url('${bgUrl}')`;
+                };
+                img.onerror = () => {
+                    console.warn('Failed to load background image, using default');
+                    background.style.backgroundImage = `url('${wallpapers[0]}')`;
+                };
+                img.src = bgUrl;
+            }
         }
 
         // Update user avatar display
@@ -1058,7 +1103,7 @@
                 const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
                 
                 if (photoURL) {
-                    accountAvatar.innerHTML = `<img src="${photoURL}" alt="${displayName}">`;
+                    accountAvatar.innerHTML = `<img src="${photoURL}" alt="${displayName}" onerror="this.onerror=null; this.parentElement.innerHTML='<span>${initials}</span>'; this.parentElement.style.backgroundColor=getRandomColor();">`;
                 } else {
                     accountAvatar.innerHTML = `<span>${initials}</span>`;
                     accountAvatar.style.backgroundColor = getRandomColor();
@@ -1084,7 +1129,6 @@
         async function signInWithGoogle() {
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
-                // Add scopes if needed
                 provider.addScope('profile');
                 provider.addScope('email');
                 
@@ -1092,7 +1136,6 @@
                 currentUser = result.user;
                 updateUserDisplay(currentUser);
                 
-                // Show welcome message
                 showNotification(`Welcome, ${currentUser.displayName}!`);
                 
                 return result.user;
@@ -1118,8 +1161,13 @@
 
         // Show notification
         function showNotification(message, isError = false) {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(n => n.remove());
+            
             // Create notification element
             const notification = document.createElement('div');
+            notification.className = 'notification';
             notification.style.cssText = `
                 position: fixed;
                 top: 20px;
@@ -1134,6 +1182,7 @@
                 font-weight: 500;
                 max-width: 300px;
                 word-wrap: break-word;
+                backdrop-filter: blur(10px);
             `;
             
             notification.textContent = message;
@@ -1145,23 +1194,34 @@
                 setTimeout(() => notification.remove(), 300);
             }, 3000);
             
-            // Add CSS animations
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOut {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(100%); opacity: 0; }
-                }
-            `;
-            document.head.appendChild(style);
+            // Add CSS animations if not already present
+            if (!document.querySelector('#notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOut {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
+        // Create modal overlay
+        function createModalOverlay() {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            return overlay;
         }
 
         // Show account modal
         function showAccountModal() {
+            const overlay = createModalOverlay();
             const modal = document.createElement('div');
             modal.className = 'account-modal';
             
@@ -1180,7 +1240,7 @@
                     <div class="account-content">
                         <div class="user-info">
                             <div class="user-avatar-large">
-                                ${photoURL ? `<img src="${photoURL}" alt="${displayName}">` : `<span>${initials}</span>`}
+                                ${photoURL ? `<img src="${photoURL}" alt="${displayName}" onerror="this.onerror=null; this.parentElement.innerHTML='<span>${initials}</span>'; this.parentElement.style.backgroundColor=getRandomColor();">` : `<span>${initials}</span>`}
                             </div>
                             <div class="user-details">
                                 <div class="user-name">${displayName}</div>
@@ -1195,7 +1255,7 @@
                         </div>
                     </div>
                     <div class="account-footer">
-                        Chrome OS Desktop v1.0
+                        Endroid OS Desktop v1.0 Beta
                     </div>
                 `;
             } else {
@@ -1228,7 +1288,21 @@
                 `;
             }
             
+            document.body.appendChild(overlay);
             document.body.appendChild(modal);
+            
+            // Add close button
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'win-btn close';
+            closeBtn.style.position = 'absolute';
+            closeBtn.style.top = '10px';
+            closeBtn.style.right = '10px';
+            closeBtn.innerHTML = '<span class="material-icons">close</span>';
+            closeBtn.addEventListener('click', () => {
+                modal.remove();
+                overlay.remove();
+            });
+            modal.querySelector('.account-header').appendChild(closeBtn);
             
             // Add event listeners
             if (currentUser) {
@@ -1236,6 +1310,7 @@
                 document.getElementById('signout-btn').addEventListener('click', () => {
                     signOut();
                     modal.remove();
+                    overlay.remove();
                 });
             } else {
                 // Signed out state
@@ -1248,6 +1323,7 @@
                     const user = await signInWithGoogle();
                     if (user) {
                         modal.remove();
+                        overlay.remove();
                         // Show updated account modal
                         setTimeout(() => showAccountModal(), 500);
                     } else {
@@ -1259,25 +1335,15 @@
                 document.getElementById('guest-btn').addEventListener('click', () => {
                     showNotification('Continuing as guest. Settings will be saved locally.');
                     modal.remove();
+                    overlay.remove();
                 });
             }
             
-            // Close on background click
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.remove();
-                }
+            // Close on overlay click
+            overlay.addEventListener('click', () => {
+                modal.remove();
+                overlay.remove();
             });
-            
-            // Close button (X)
-            const closeBtn = document.createElement('button');
-            closeBtn.className = 'win-btn close';
-            closeBtn.style.position = 'absolute';
-            closeBtn.style.top = '10px';
-            closeBtn.style.right = '10px';
-            closeBtn.innerHTML = '<span class="material-icons">close</span>';
-            closeBtn.addEventListener('click', () => modal.remove());
-            modal.querySelector('.account-header').appendChild(closeBtn);
         }
 
         // Initialize
@@ -1289,12 +1355,16 @@
                 
                 // Save user info to localStorage if signed in
                 if (user) {
-                    localStorage.setItem('chromeOS-user', JSON.stringify({
-                        uid: user.uid,
-                        displayName: user.displayName,
-                        email: user.email,
-                        photoURL: user.photoURL
-                    }));
+                    try {
+                        localStorage.setItem('chromeOS-user', JSON.stringify({
+                            uid: user.uid,
+                            displayName: user.displayName,
+                            email: user.email,
+                            photoURL: user.photoURL
+                        }));
+                    } catch (e) {
+                        console.error('Error saving user data:', e);
+                    }
                 } else {
                     localStorage.removeItem('chromeOS-user');
                 }
@@ -1327,6 +1397,24 @@
                 showNotification('No new notifications');
             });
             
+            // Click on desktop to focus it (lower window z-index)
+            document.getElementById('desktop').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('desktop') || 
+                    e.target.classList.contains('desktop-icons-grid')) {
+                    // Lower all window z-indices
+                    windows.forEach(window => {
+                        window.style.zIndex = 100;
+                    });
+                    windowZIndex = 200; // Reset counter
+                    activeWindow = null;
+                    
+                    // Remove active state from taskbar items
+                    taskbarItems.forEach(item => {
+                        item.item.classList.remove('active');
+                    });
+                }
+            });
+            
             // Keyboard shortcuts
             document.addEventListener('keydown', (e) => {
                 if (e.ctrlKey && e.key === 'n') {
@@ -1341,6 +1429,28 @@
                     e.preventDefault();
                     showAccountModal();
                 }
+                if (e.key === 'Escape') {
+                    // Close active modal if any
+                    const modal = document.querySelector('.settings-modal, .account-modal, .app-launcher-modal');
+                    const overlay = document.querySelector('.modal-overlay');
+                    if (modal) {
+                        modal.remove();
+                        if (overlay) overlay.remove();
+                    }
+                }
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                // Update window boundaries
+                windows.forEach(window => {
+                    if (window.classList.contains('maximized')) {
+                        window.style.width = `calc(100vw - 40px)`;
+                        window.style.height = `calc(100vh - 96px)`;
+                        window.style.left = '20px';
+                        window.style.top = '20px';
+                    }
+                });
             });
         }
 
@@ -1355,6 +1465,7 @@
                 const icon = document.createElement('div');
                 icon.className = 'desktop-icon';
                 icon.dataset.appId = app.id;
+                icon.title = app.name;
                 
                 icon.innerHTML = `
                     <span class="material-icons">${app.icon}</span>
@@ -1406,10 +1517,20 @@
             window.id = windowId;
             window.dataset.appId = app.id;
             
-            // Position window
+            // Position window with boundaries
             const offset = windows.size * 30;
-            window.style.left = `${50 + offset}px`;
-            window.style.top = `${50 + offset}px`;
+            const desktop = document.getElementById('desktop');
+            const desktopRect = desktop.getBoundingClientRect();
+            
+            let left = 50 + offset;
+            let top = 50 + offset;
+            
+            // Ensure window stays within desktop bounds
+            left = Math.min(left, desktopRect.width - 400);
+            top = Math.min(top, desktopRect.height - 300);
+            
+            window.style.left = `${Math.max(0, left)}px`;
+            window.style.top = `${Math.max(0, top)}px`;
             window.style.width = '800px';
             window.style.height = '600px';
             window.style.zIndex = windowZIndex++;
@@ -1435,6 +1556,7 @@
                             sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals"
                             allowfullscreen></iframe>
                 </div>
+                <div class="window-resize-handle"></div>
             `;
             
             // Add event listeners for window controls
@@ -1442,12 +1564,13 @@
             const minimizeBtn = window.querySelector('.minimize');
             const maximizeBtn = window.querySelector('.maximize');
             const closeBtn = window.querySelector('.close');
+            const resizeHandle = window.querySelector('.window-resize-handle');
             
             // Make draggable
             makeDraggable(window, titleBar);
             
             // Make resizable
-            makeResizable(window);
+            makeResizable(window, resizeHandle);
             
             // Window controls
             minimizeBtn.addEventListener('click', (e) => {
@@ -1466,8 +1589,17 @@
             });
             
             // Click to focus
-            window.addEventListener('mousedown', () => {
-                bringToFront(window);
+            window.addEventListener('mousedown', (e) => {
+                if (!e.target.closest('.win-btn')) {
+                    bringToFront(window);
+                }
+            });
+            
+            // Touch support
+            window.addEventListener('touchstart', (e) => {
+                if (!e.target.closest('.win-btn')) {
+                    bringToFront(window);
+                }
             });
             
             return window;
@@ -1478,31 +1610,34 @@
             let isDragging = false;
             let startX, startY, startLeft, startTop;
             
-            handle.addEventListener('mousedown', startDrag);
-            
-            function startDrag(e) {
+            const startDrag = (e) => {
                 if (e.target.closest('.win-btn')) return;
                 
                 isDragging = true;
                 bringToFront(window);
                 
                 const rect = window.getBoundingClientRect();
-                startX = e.clientX;
-                startY = e.clientY;
+                startX = e.clientX || e.touches[0].clientX;
+                startY = e.clientY || e.touches[0].clientY;
                 startLeft = rect.left;
                 startTop = rect.top;
                 
                 document.addEventListener('mousemove', drag);
                 document.addEventListener('mouseup', stopDrag);
-            }
+                document.addEventListener('touchmove', drag, { passive: false });
+                document.addEventListener('touchend', stopDrag);
+            };
             
-            function drag(e) {
+            const drag = (e) => {
                 if (!isDragging) return;
                 
                 e.preventDefault();
                 
-                let newX = startLeft + (e.clientX - startX);
-                let newY = startTop + (e.clientY - startY);
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                
+                let newX = startLeft + (clientX - startX);
+                let newY = startTop + (clientY - startY);
                 
                 // Boundary checking
                 const desktop = document.getElementById('desktop');
@@ -1514,45 +1649,78 @@
                 
                 window.style.left = `${newX}px`;
                 window.style.top = `${newY}px`;
-            }
+            };
             
-            function stopDrag() {
+            const stopDrag = () => {
                 isDragging = false;
                 document.removeEventListener('mousemove', drag);
                 document.removeEventListener('mouseup', stopDrag);
-            }
+                document.removeEventListener('touchmove', drag);
+                document.removeEventListener('touchend', stopDrag);
+            };
+            
+            handle.addEventListener('mousedown', startDrag);
+            handle.addEventListener('touchstart', startDrag, { passive: true });
         }
 
         // Make window resizable
-        function makeResizable(window) {
-            const resizeHandle = 10;
+        function makeResizable(window, handle) {
+            let isResizing = false;
+            let startX, startY, startWidth, startHeight;
             
+            const startResize = (e) => {
+                e.preventDefault();
+                isResizing = true;
+                bringToFront(window);
+                
+                const rect = window.getBoundingClientRect();
+                startX = e.clientX || e.touches[0].clientX;
+                startY = e.clientY || e.touches[0].clientY;
+                startWidth = rect.width;
+                startHeight = rect.height;
+                
+                document.addEventListener('mousemove', resize);
+                document.addEventListener('mouseup', stopResize);
+                document.addEventListener('touchmove', resize, { passive: false });
+                document.addEventListener('touchend', stopResize);
+            };
+            
+            const resize = (e) => {
+                if (!isResizing) return;
+                
+                e.preventDefault();
+                
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                
+                const newWidth = Math.max(400, startWidth + (clientX - startX));
+                const newHeight = Math.max(300, startHeight + (clientY - startY));
+                
+                // Max boundaries
+                const desktop = document.getElementById('desktop');
+                const maxWidth = desktop.clientWidth - window.offsetLeft;
+                const maxHeight = desktop.clientHeight - window.offsetTop;
+                
+                window.style.width = `${Math.min(newWidth, maxWidth)}px`;
+                window.style.height = `${Math.min(newHeight, maxHeight)}px`;
+            };
+            
+            const stopResize = () => {
+                isResizing = false;
+                document.removeEventListener('mousemove', resize);
+                document.removeEventListener('mouseup', stopResize);
+                document.removeEventListener('touchmove', resize);
+                document.removeEventListener('touchend', stopResize);
+            };
+            
+            handle.addEventListener('mousedown', startResize);
+            handle.addEventListener('touchstart', startResize, { passive: true });
+            
+            // Also allow resizing from bottom-right corner
             window.addEventListener('mousedown', (e) => {
-                if (e.offsetX > window.offsetWidth - resizeHandle && 
-                    e.offsetY > window.offsetHeight - resizeHandle) {
-                    
-                    e.preventDefault();
-                    
-                    let startX = e.clientX;
-                    let startY = e.clientY;
-                    let startWidth = window.offsetWidth;
-                    let startHeight = window.offsetHeight;
-                    
-                    function resize(e) {
-                        const newWidth = startWidth + (e.clientX - startX);
-                        const newHeight = startHeight + (e.clientY - startY);
-                        
-                        window.style.width = `${Math.max(400, newWidth)}px`;
-                        window.style.height = `${Math.max(300, newHeight)}px`;
-                    }
-                    
-                    function stopResize() {
-                        document.removeEventListener('mousemove', resize);
-                        document.removeEventListener('mouseup', stopResize);
-                    }
-                    
-                    document.addEventListener('mousemove', resize);
-                    document.addEventListener('mouseup', stopResize);
+                if (e.offsetX > window.offsetWidth - 15 && 
+                    e.offsetY > window.offsetHeight - 15) {
+                    startResize(e);
                 }
             });
         }
@@ -1563,6 +1731,7 @@
             const item = document.createElement('div');
             item.className = 'taskbar-item';
             item.dataset.appId = app.id;
+            item.title = app.name;
             
             item.innerHTML = `<span class="material-icons">${app.icon}</span>`;
             
@@ -1639,23 +1808,24 @@
         // Show app launcher
         function showAppLauncher() {
             // Create launcher modal
+            const overlay = createModalOverlay();
             const launcher = document.createElement('div');
             launcher.className = 'app-launcher-modal';
             
             launcher.innerHTML = `
-                <div style="width: 600px; max-width: 90%;">
+                <div style="width: 600px; max-width: 90%; max-height: 90vh; overflow-y: auto;">
                     <div style="margin-bottom: 40px; text-align: center;">
                         <h2 style="color: var(--on-surface); margin-bottom: 20px;">Applications</h2>
                         <div style="display: grid; grid-template-columns: repeat(auto-fill, 100px); gap: 20px; justify-content: center;">
                             ${apps.map(app => `
-                                <div class="desktop-icon" style="color: var(--on-surface); cursor: pointer; padding: 15px;" data-app-id="${app.id}">
+                                <div class="desktop-icon" style="color: var(--on-surface); cursor: pointer; padding: 15px;" data-app-id="${app.id}" title="${app.name}">
                                     <span class="material-icons" style="font-size: 36px;">${app.icon}</span>
                                     <span style="margin-top: 5px; font-size: 12px;">${app.name}</span>
                                 </div>
                             `).join('')}
                         </div>
                     </div>
-                    <div style="text-align: center;">
+                    <div style="text-align: center; padding: 20px 0;">
                         <button id="close-launcher" style="padding: 10px 30px; background: var(--primary); color: white; border: none; border-radius: 24px; cursor: pointer; font-size: 14px;">
                             Close
                         </button>
@@ -1663,6 +1833,7 @@
                 </div>
             `;
             
+            document.body.appendChild(overlay);
             document.body.appendChild(launcher);
             
             // Add click handlers for apps
@@ -1674,6 +1845,7 @@
                     if (app) {
                         openApp(app);
                         launcher.remove();
+                        overlay.remove();
                     }
                 });
             });
@@ -1682,19 +1854,30 @@
             launcher.querySelector('#close-launcher').addEventListener('click', (e) => {
                 e.stopPropagation();
                 launcher.remove();
+                overlay.remove();
             });
             
             // Close on background click
-            launcher.addEventListener('click', (e) => {
-                if (e.target === launcher) {
-                    launcher.remove();
-                }
+            overlay.addEventListener('click', () => {
+                launcher.remove();
+                overlay.remove();
             });
+            
+            // Close on escape
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    launcher.remove();
+                    overlay.remove();
+                    document.removeEventListener('keydown', handleEscape);
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
         }
 
         // Show settings
         function showSettings() {
             // Create settings modal
+            const overlay = createModalOverlay();
             const modal = document.createElement('div');
             modal.className = 'settings-modal';
             modal.innerHTML = `
@@ -1751,13 +1934,13 @@
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <div class="user-avatar">
                                     ${currentUser.photoURL ? 
-                                        `<img src="${currentUser.photoURL}" alt="${currentUser.displayName}">` : 
+                                        `<img src="${currentUser.photoURL}" alt="${currentUser.displayName}" onerror="this.onerror=null; this.parentElement.innerHTML='<span>${(currentUser.displayName || 'User').split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}</span>'; this.parentElement.style.backgroundColor=getRandomColor();">` : 
                                         `<span>${(currentUser.displayName || 'User').split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}</span>`
                                     }
                                 </div>
-                                <div>
-                                    <div style="font-weight: 500;">${currentUser.displayName || 'User'}</div>
-                                    <div style="font-size: 12px; color: #5f6368;">${currentUser.email}</div>
+                                <div style="min-width: 0;">
+                                    <div style="font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${currentUser.displayName || 'User'}</div>
+                                    <div style="font-size: 12px; color: #5f6368; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${currentUser.email}</div>
                                 </div>
                             </div>
                         </div>
@@ -1770,6 +1953,7 @@
                 </div>
             `;
             
+            document.body.appendChild(overlay);
             document.body.appendChild(modal);
             
             // Set current values
@@ -1779,8 +1963,15 @@
             }
             
             // Add event listeners
-            document.getElementById('close-settings').addEventListener('click', () => modal.remove());
-            document.getElementById('cancel-settings').addEventListener('click', () => modal.remove());
+            document.getElementById('close-settings').addEventListener('click', () => {
+                modal.remove();
+                overlay.remove();
+            });
+            
+            document.getElementById('cancel-settings').addEventListener('click', () => {
+                modal.remove();
+                overlay.remove();
+            });
             
             document.getElementById('save-settings').addEventListener('click', () => {
                 // Get values
@@ -1796,6 +1987,8 @@
                 applySettings();
                 saveSettings();
                 modal.remove();
+                overlay.remove();
+                showNotification('Settings saved successfully');
             });
             
             // Toggle custom URL checkbox
@@ -1803,26 +1996,46 @@
                 this.classList.toggle('checked');
             });
             
-            // Close on background click
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.remove();
-                }
+            // Close on overlay click
+            overlay.addEventListener('click', () => {
+                modal.remove();
+                overlay.remove();
             });
+            
+            // Close on escape
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    modal.remove();
+                    overlay.remove();
+                    document.removeEventListener('keydown', handleEscape);
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
         }
 
         // Update clock
         function updateClock() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString([], { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
-            document.getElementById('clock').textContent = timeString;
+            try {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                document.getElementById('clock').textContent = timeString;
+            } catch (e) {
+                console.error('Error updating clock:', e);
+            }
         }
 
         // Initialize on load
         window.addEventListener('load', init);
+        
+        // Prevent context menu
+        document.addEventListener('contextmenu', (e) => {
+            if (e.target.closest('.window') || e.target.closest('#desktop')) {
+                e.preventDefault();
+            }
+        });
     </script>
 </body>
 </html>
