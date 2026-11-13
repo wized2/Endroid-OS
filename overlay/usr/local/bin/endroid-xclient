@@ -1,9 +1,9 @@
 #!/bin/sh
 export DISPLAY=:0
-# No WM needed for single fullscreen app; use matchbox or just the app
+export GDK_BACKEND=x11
 if command -v openbox >/dev/null 2>&1; then
   openbox &
-  sleep 0.3
+  sleep 0.4
 fi
 echo "endroid-boot: ui online"
 echo "endroid-boot: ui online" > /dev/console 2>/dev/null || true

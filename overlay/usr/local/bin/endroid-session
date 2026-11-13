@@ -3,15 +3,28 @@ export HOME=/root
 export DISPLAY=:0
 export XDG_RUNTIME_DIR=/tmp/runtime-root
 export GDK_BACKEND=x11
-mkdir -p "$XDG_RUNTIME_DIR"
+# Avoid xauth "bad display name hostname:0"
+hostname localhost 2>/dev/null || true
+export HOSTNAME=localhost
+
+mkdir -p "$XDG_RUNTIME_DIR" /tmp /var/log
 chmod 700 "$XDG_RUNTIME_DIR"
 
 echo "endroid-os: session start"
 
 if ! command -v Xorg >/dev/null 2>&1; then
-  echo "endroid-os: no Xorg"
+  echo "endroid-os: no Xorg — idle"
   exec sleep infinity
 fi
 
-# startx runs our client
-exec startx /usr/local/bin/endroid-xclient -- :0 vt1 -nolisten tcp
+# xinit is more predictable than startx in initramfs
+if command -v xinit >/dev/null 2>&1; then
+  xinit /usr/local/bin/endroid-xclient -- /usr/bin/Xorg :0 vt1 -nolisten tcp -noreset 2>/tmp/xorg.log \
+    || echo "endroid-os: xinit failed (see /tmp/xorg.log)"
+else
+  startx /usr/local/bin/endroid-xclient -- :0 vt1 -nolisten tcp 2>/tmp/xorg.log \
+    || echo "endroid-os: startx failed"
+fi
+
+echo "endroid-os: session ended — keeping init alive"
+exec sleep infinity
