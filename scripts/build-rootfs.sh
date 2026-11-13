@@ -35,7 +35,7 @@ docker run --rm --privileged --network host \
         xorg-server xf86-video-modesetting xf86-input-libinput \
         mesa-dri-gallium mesa-egl \
         openbox xinit xauth \
-        gtk4.0 py3-gobject py3-cairo python3 \
+        gtk4.0 py3-gobject3 py3-cairo python3 \
         font-noto ttf-dejavu \
         util-linux e2fsprogs iproute2
     "
