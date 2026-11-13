@@ -11,7 +11,7 @@ echo "==> unpack minirootfs"
 tar -xzf "$DEP/alpine-minirootfs.tar.gz" -C "$ROOTFS"
 echo "nameserver 1.1.1.1" > "$ROOTFS/etc/resolv.conf"
 
-echo "==> packages (GTK4 shell — no browser)"
+echo "==> packages (GTK4, linux-virt, no browser)"
 docker run --rm --privileged --network host \
   -v "$ROOTFS:/rootfs" \
   -v "$ROOT/overlay:/overlay:ro" \
@@ -20,6 +20,10 @@ docker run --rm --privileged --network host \
   sh -c '
     set -e
     echo "nameserver 1.1.1.1" > /rootfs/etc/resolv.conf
+    # ensure community repo
+    echo "https://dl-cdn.alpinelinux.org/alpine/v3.20/main" > /rootfs/etc/apk/repositories
+    echo "https://dl-cdn.alpinelinux.org/alpine/v3.20/community" >> /rootfs/etc/apk/repositories
+
     mount --bind /proc /rootfs/proc
     mount --bind /sys /rootfs/sys
     mount --bind /dev /rootfs/dev
@@ -30,7 +34,7 @@ docker run --rm --privileged --network host \
       set -e
       apk update
       apk add --no-cache \
-        linux-lts \
+        linux-virt \
         busybox-extras \
         xorg-server xf86-video-modesetting xf86-input-libinput \
         mesa-dri-gallium mesa-egl \
@@ -42,8 +46,8 @@ docker run --rm --privileged --network host \
 
     cp -a /overlay/. /rootfs/
     chmod +x /rootfs/init /rootfs/usr/local/bin/* /rootfs/usr/share/endroid/shell.py
-
     echo endroid > /rootfs/etc/hostname
+
     mkdir -p /rootfs/etc/X11
     cat > /rootfs/etc/X11/xorg.conf << "XORG"
 Section "ServerFlags"
@@ -51,12 +55,18 @@ Section "ServerFlags"
 EndSection
 XORG
 
-    if [ -f /rootfs/boot/vmlinuz-lts ]; then
-      cp -f /rootfs/boot/vmlinuz-lts /outboot/vmlinuz
+    # kernel image
+    if [ -f /rootfs/boot/vmlinuz-virt ]; then
+      cp -f /rootfs/boot/vmlinuz-virt /outboot/vmlinuz
     else
       f=$(find /rootfs/boot -maxdepth 1 -type f -name "vmlinuz*" | head -n1)
       cp -f "$f" /outboot/vmlinuz
     fi
+
+    # Drop heavy/unused bits to shrink initrd
+    rm -rf /rootfs/boot/initramfs* /rootfs/var/cache/apk/* \
+           /rootfs/usr/share/man /rootfs/usr/share/doc \
+           /rootfs/usr/share/gtk-doc 2>/dev/null || true
 
     umount /rootfs/dev/pts 2>/dev/null || true
     umount /rootfs/dev 2>/dev/null || true

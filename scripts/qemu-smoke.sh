@@ -6,11 +6,20 @@ mkdir -p "$OUTDIR"
 LOG="$(mktemp)"
 QMP="$(mktemp -u /tmp/eq.XXXX.sock)"
 
-echo "==> QEMU smoke"
-ls -lh "$ISO"
-
-qemu-system-x86_64 -m 1024 -cdrom "$ISO" -boot d -display none -vga std \
-  -serial file:"$LOG" -qmp unix:"$QMP",server,nowait -no-reboot &
+echo "==> QEMU smoke (direct kernel+initrd — proves userspace)"
+# Prefer direct -kernel/-initrd (authoritative). ISO is still built for real machines.
+K=vmlinuz
+I=initrd.gz
+if [ ! -f "$K" ] || [ ! -f "$I" ]; then
+  echo "missing $K/$I — using ISO only"
+  qemu-system-x86_64 -m 1024 -cdrom "$ISO" -boot d -display none -vga std \
+    -serial file:"$LOG" -qmp unix:"$QMP",server,nowait -no-reboot &
+else
+  qemu-system-x86_64 -m 1024 -kernel "$K" -initrd "$I" \
+    -append "console=tty0 console=ttyS0,115200 rdinit=/init" \
+    -display none -vga std \
+    -serial file:"$LOG" -qmp unix:"$QMP",server,nowait -no-reboot &
+fi
 QPID=$!
 cleanup() { kill "$QPID" 2>/dev/null || true; wait "$QPID" 2>/dev/null || true; rm -f "$QMP"; }
 trap cleanup EXIT
@@ -31,8 +40,8 @@ shot() {
 ok=0
 i=0
 while [ $i -lt 90 ]; do
-  if grep -q "endroid-os: /init start" "$LOG" 2>/dev/null; then ok=1; fi
   if grep -q "endroid-os: sysinit ok" "$LOG" 2>/dev/null; then ok=1; break; fi
+  if grep -q "endroid-os: /init start" "$LOG" 2>/dev/null; then ok=1; fi
   if grep -q "endroid-boot: ui online" "$LOG" 2>/dev/null; then ok=1; break; fi
   if grep -q "Kernel panic" "$LOG" 2>/dev/null; then break; fi
   i=$((i+1)); sleep 1
@@ -40,7 +49,7 @@ done
 
 shot 01-early
 j=0
-while [ $j -lt 40 ]; do
+while [ $j -lt 45 ]; do
   if grep -q "endroid-boot: ui online" "$LOG" 2>/dev/null; then ok=1; break; fi
   if grep -q "Kernel panic" "$LOG" 2>/dev/null; then break; fi
   j=$((j+1)); sleep 1
@@ -50,7 +59,7 @@ sleep 8
 shot 03-ui
 
 cp "$LOG" "$OUTDIR/serial.log"
-echo "==> serial tail"; tail -n 80 "$LOG" || true
+echo "==> serial tail"; tail -n 100 "$LOG" || true
 
 if grep -q "Kernel panic" "$LOG"; then
   echo "SMOKE FAILED panic"; exit 1

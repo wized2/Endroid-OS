@@ -4,40 +4,43 @@ ROOT="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"
 BUILD="$ROOT/build"
 ROOTFS="$BUILD/rootfs"
 ISO="$BUILD/iso"
-DEP="$ROOT/deps"
 OUT="$ROOT/endroid-os.iso"
 
 rm -rf "$ISO"
-mkdir -p "$ISO/boot" "$ISO/EFI/BOOT"
+mkdir -p "$ISO/boot/grub"
 
-echo "==> initramfs"
+echo "==> initrd"
 (
   cd "$ROOTFS"
   find . | cpio -H newc -o
 ) | gzip -n -1 > "$BUILD/boot/initrd.gz"
 gzip -t "$BUILD/boot/initrd.gz"
-ls -lh "$BUILD/boot/initrd.gz"
-# verify /init present
-zcat "$BUILD/boot/initrd.gz" | cpio -t | grep -E '^\./init$|^init$' | head
+ls -lh "$BUILD/boot/initrd.gz" "$BUILD/boot/vmlinuz"
+zcat "$BUILD/boot/initrd.gz" | cpio -t | grep -E '^\./init$' | head
 
-cp "$BUILD/boot/vmlinuz" "$ISO/vmlinuz"
-cp "$BUILD/boot/initrd.gz" "$ISO/initrd.gz"
-cp "$ROOT/boot/limine.cfg" "$ISO/limine.cfg"
-cp "$ROOT/boot/limine.conf" "$ISO/limine.conf"
+cp "$BUILD/boot/vmlinuz" "$ISO/boot/vmlinuz"
+cp "$BUILD/boot/initrd.gz" "$ISO/boot/initrd.gz"
 
-LIMINE_DIR="$DEP/limine"
-make -C "$LIMINE_DIR" limine 2>/dev/null || true
-cp "$LIMINE_DIR/limine-bios.sys" "$ISO/"
-cp "$LIMINE_DIR/limine-bios-cd.bin" "$ISO/"
-cp "$LIMINE_DIR/limine-uefi-cd.bin" "$ISO/"
-cp "$LIMINE_DIR/BOOTX64.EFI" "$ISO/EFI/BOOT/BOOTX64.EFI"
+cat > "$ISO/boot/grub/grub.cfg" << 'GRUB'
+set timeout=2
+set default=0
+serial --unit=0 --speed=115200
+terminal_input serial console
+terminal_output serial console
+menuentry "Endroid OS" {
+    linux /boot/vmlinuz console=tty0 console=ttyS0,115200 rdinit=/init
+    initrd /boot/initrd.gz
+}
+GRUB
 
-xorriso -as mkisofs -R -r -J -joliet-long -l -V ENDROID_OS -o "$OUT" \
-  -b limine-bios-cd.bin -no-emul-boot -boot-load-size 4 -boot-info-table \
-  -eltorito-alt-boot -e limine-uefi-cd.bin -no-emul-boot \
-  "$ISO"
-
-if [ -x "$LIMINE_DIR/limine" ]; then
-  "$LIMINE_DIR/limine" bios-install "$OUT" || true
+echo "==> grub-mkrescue"
+if ! command -v grub-mkrescue >/dev/null 2>&1; then
+  echo "grub-mkrescue missing" >&2
+  exit 1
 fi
+grub-mkrescue -o "$OUT" "$ISO"
 ls -lh "$OUT"
+
+# Also extract kernel/initrd for direct QEMU testing
+cp "$BUILD/boot/vmlinuz" "$ROOT/vmlinuz"
+cp "$BUILD/boot/initrd.gz" "$ROOT/initrd.gz"
