@@ -1,0 +1,12 @@
+#!/bin/sh
+echo "endroid-os: /init start"
+mount -t proc proc /proc
+mount -t sysfs sys /sys
+mount -t devtmpfs dev /dev 2>/dev/null || mount -t tmpfs tmpfs /dev
+mkdir -p /dev/pts /tmp /run /var/log
+mount -t devpts devpts /dev/pts 2>/dev/null || true
+mount -t tmpfs tmpfs /tmp
+mount -t tmpfs tmpfs /run
+hostname endroid
+echo "endroid-os: sysinit ok"
+exec /usr/local/bin/endroid-session

@@ -1,0 +1,17 @@
+#!/bin/sh
+export HOME=/root
+export DISPLAY=:0
+export XDG_RUNTIME_DIR=/tmp/runtime-root
+export GDK_BACKEND=x11
+mkdir -p "$XDG_RUNTIME_DIR"
+chmod 700 "$XDG_RUNTIME_DIR"
+
+echo "endroid-os: session start"
+
+if ! command -v Xorg >/dev/null 2>&1; then
+  echo "endroid-os: no Xorg"
+  exec sleep infinity
+fi
+
+# startx runs our client
+exec startx /usr/local/bin/endroid-xclient -- :0 vt1 -nolisten tcp
