@@ -12,10 +12,10 @@ K=vmlinuz
 I=initrd.gz
 if [ ! -f "$K" ] || [ ! -f "$I" ]; then
   echo "missing $K/$I — using ISO only"
-  qemu-system-x86_64 -m 1024 -cdrom "$ISO" -boot d -display none -vga std \
+  qemu-system-x86_64 -m 2048 -cdrom "$ISO" -boot d -display none -vga std \
     -serial file:"$LOG" -qmp unix:"$QMP",server,nowait -no-reboot &
 else
-  qemu-system-x86_64 -m 1024 -kernel "$K" -initrd "$I" \
+  qemu-system-x86_64 -m 2048 -kernel "$K" -initrd "$I" \
     -append "console=tty0 console=ttyS0,115200 rdinit=/init" \
     -display none -vga std \
     -serial file:"$LOG" -qmp unix:"$QMP",server,nowait -no-reboot &

@@ -66,7 +66,14 @@ XORG
     # Drop heavy/unused bits to shrink initrd
     rm -rf /rootfs/boot/initramfs* /rootfs/var/cache/apk/* \
            /rootfs/usr/share/man /rootfs/usr/share/doc \
-           /rootfs/usr/share/gtk-doc 2>/dev/null || true
+           /rootfs/usr/share/gtk-doc \
+           /rootfs/usr/lib/python3.*/turtledemo \
+           /rootfs/usr/lib/python3.*/test \
+           /rootfs/usr/lib/python3.*/ensurepip \
+           /rootfs/usr/share/locale \
+           /rootfs/usr/share/X11/locale \
+           /rootfs/var/lib/apk 2>/dev/null || true
+    rm -rf /rootfs/lib/firmware 2>/dev/null || true
 
     umount /rootfs/dev/pts 2>/dev/null || true
     umount /rootfs/dev 2>/dev/null || true
